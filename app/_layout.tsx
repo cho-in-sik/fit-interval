@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import '../global.css';
 import { PaperProvider } from 'react-native-paper';
+import { View } from 'react-native';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -35,14 +36,17 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <PaperProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </PaperProvider>
-    </ThemeProvider>
+    <View style={{ flex: 1 }}>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <PaperProvider>
+          <Stack>
+            <Stack.Screen name="counter" options={{ headerShown: false }} />
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </PaperProvider>
+      </ThemeProvider>
+    </View>
   );
 }
