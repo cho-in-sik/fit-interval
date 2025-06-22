@@ -11,9 +11,11 @@ import {
   Vibration,
   Animated,
   Dimensions,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import Drawer from '@/components/Drawer';
 
 interface TimerSettings {
   workTime: { minutes: number; seconds: number };
@@ -36,28 +38,6 @@ const FitIntervalApp: React.FC = () => {
   });
 
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const drawerWidth = Dimensions.get('window').width * 0.7;
-  const slideAnim = useRef(new Animated.Value(drawerWidth)).current;
-
-  useEffect(() => {
-    if (drawerVisible) {
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [drawerVisible]);
-
-  const closeDrawer = () => {
-    Animated.timing(slideAnim, {
-      toValue: drawerWidth,
-      duration: 250,
-      useNativeDriver: true,
-    }).start(() => {
-      setDrawerVisible(false);
-    });
-  };
 
   const [showOptions, setShowOptions] = useState(false);
   const [timePickerModal, setTimePickerModal] = useState({
@@ -185,7 +165,11 @@ const FitIntervalApp: React.FC = () => {
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-5 bg-white border-b border-gray-200">
           <View className="flex-row items-center">
-            <Ionicons name="stopwatch" size={24} color="#3B82F6" />
+            <Image
+              source={require('../assets/images/fitinterval.png')}
+              style={{ width: 50, height: 50 }}
+              resizeMode="cover"
+            />
             <Text className="text-xl font-bold ml-2 text-gray-800">
               FitInterval
             </Text>
@@ -406,7 +390,7 @@ const FitIntervalApp: React.FC = () => {
       <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 pb-8">
         <TouchableOpacity
           onPress={startTimer}
-          className="w-full py-4 bg-blue-600 rounded-xl shadow-md flex-row items-center justify-center active:bg-blue-700"
+          className="w-full py-4 bg-[#007AFF] rounded-xl shadow-md flex-row items-center justify-center active:bg-blue-700"
         >
           <Ionicons name="play" size={20} color="white" />
           <Text className="text-white font-semibold ml-2">Start Timer</Text>
@@ -503,71 +487,10 @@ const FitIntervalApp: React.FC = () => {
       </Modal>
 
       {/* Drawer Menu Modal */}
-      <Modal
-        visible={drawerVisible}
-        transparent={true}
-        animationType="none"
-        onRequestClose={closeDrawer}
-      >
-        <TouchableOpacity
-          className="flex-1 bg-black/20"
-          activeOpacity={1}
-          onPressOut={closeDrawer}
-        >
-          <Animated.View
-            style={[
-              {
-                width: drawerWidth,
-                transform: [{ translateX: slideAnim }],
-              },
-            ]}
-            className="h-full bg-white shadow-2xl ml-auto rounded-2xl"
-          >
-            <TouchableOpacity activeOpacity={1} className="flex-1">
-              <SafeAreaView className="flex-1 p-5">
-                <View className="flex-row justify-between items-center mb-8">
-                  <Text className="text-xl font-bold text-gray-800">Menu</Text>
-                  <TouchableOpacity
-                    onPress={closeDrawer}
-                    className="w-8 h-8 items-center justify-center rounded-full bg-gray-100"
-                  >
-                    <Ionicons name="close" size={16} color="#374151" />
-                  </TouchableOpacity>
-                </View>
-
-                <View className="space-y-6">
-                  <TouchableOpacity className="flex-row items-center">
-                    <Ionicons
-                      name="settings-outline"
-                      size={22}
-                      color="#374151"
-                    />
-                    <Text className="text-lg ml-4 text-gray-700">Settings</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity className="flex-row items-center">
-                    <Ionicons
-                      name="share-social-outline"
-                      size={22}
-                      color="#374151"
-                    />
-                    <Text className="text-lg ml-4 text-gray-700">
-                      Share App
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity className="flex-row items-center">
-                    <Ionicons
-                      name="information-circle-outline"
-                      size={22}
-                      color="#374151"
-                    />
-                    <Text className="text-lg ml-4 text-gray-700">About</Text>
-                  </TouchableOpacity>
-                </View>
-              </SafeAreaView>
-            </TouchableOpacity>
-          </Animated.View>
-        </TouchableOpacity>
-      </Modal>
+      <Drawer
+        drawerVisible={drawerVisible}
+        setDrawerVisible={setDrawerVisible}
+      />
     </SafeAreaView>
   );
 };
