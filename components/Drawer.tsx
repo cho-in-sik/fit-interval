@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -59,7 +59,7 @@ const MenuItem = ({ item, isActive, onPress }: any) => {
 export default function Drawer({ drawerVisible, setDrawerVisible }: any) {
   const drawerWidth = Dimensions.get('window').width * 0.7;
   const slideAnim = useRef(new Animated.Value(drawerWidth)).current;
-  const [activeScreen, setActiveScreen] = useState('홈');
+  const pathname = usePathname();
 
   useEffect(() => {
     if (drawerVisible) {
@@ -82,8 +82,7 @@ export default function Drawer({ drawerVisible, setDrawerVisible }: any) {
   };
 
   const handleNavigation = (screen: string) => {
-    setActiveScreen(screen);
-    router.push(`/${screen}`);
+    router.push(screen);
     // You can add navigation logic here.
     // For now, it just closes the drawer.
     closeDrawer();
@@ -91,8 +90,8 @@ export default function Drawer({ drawerVisible, setDrawerVisible }: any) {
 
   const menuItems = [
     { name: '홈', icon: 'timer-outline', id: '/' },
-    { name: '설정', icon: 'settings-outline', id: 'settings' },
-    { name: '운동기록', icon: 'reader-outline', id: 'records' },
+    { name: '설정', icon: 'settings-outline', id: '/settings' },
+    { name: '운동기록', icon: 'reader-outline', id: '/records' },
   ];
 
   return (
@@ -133,7 +132,10 @@ export default function Drawer({ drawerVisible, setDrawerVisible }: any) {
                   <MenuItem
                     key={item.name}
                     item={item}
-                    isActive={activeScreen === item.name}
+                    isActive={
+                      pathname === item.id ||
+                      (pathname === '/' && item.id === '/')
+                    }
                     onPress={() => handleNavigation(item.id)}
                   />
                 ))}

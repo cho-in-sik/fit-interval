@@ -7,9 +7,12 @@ import {
   Switch,
   Vibration,
   SafeAreaView,
+  Image,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome6';
+import { Ionicons } from '@expo/vector-icons';
+import Drawer from '@/components/Drawer';
 
 interface SettingsScreenProps {
   onBack?: () => void;
@@ -19,6 +22,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [volume, setVolume] = useState(75);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
 
   const handleVoiceToggle = (value: boolean) => {
     setVoiceEnabled(value);
@@ -51,20 +56,24 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
       >
         <View className="flex-1 bg-white">
           {/* Settings Header */}
-          <View className="px-4 py-5 border-b border-neutral-200 flex-row items-center">
-            <TouchableOpacity
-              onPress={handleBackPress}
-              className="w-10 h-10 flex items-center justify-center rounded-full active:bg-neutral-100 mr-3"
-              activeOpacity={0.7}
-            >
-              <Icon name="chevron-left" size={16} color="#374151" solid />
-            </TouchableOpacity>
+
+          <View className="flex-row items-center justify-between px-4 pb-4 bg-white border-b border-gray-200">
             <View className="flex-row items-center">
-              <Icon name="gear" size={20} color="#007AFF" solid />
-              <Text className="text-xl font-bold ml-2 text-neutral-800">
-                Settings
+              <Image
+                source={require('../assets/images/fitinterval.png')}
+                style={{ width: 50, height: 50 }}
+                resizeMode="cover"
+              />
+              <Text className="text-xl font-bold ml-2 text-gray-800">
+                FitInterval
               </Text>
             </View>
+            <TouchableOpacity
+              onPress={() => setDrawerVisible(true)}
+              className="w-10 h-10 items-center justify-center rounded-full "
+            >
+              <Ionicons name="menu" size={20} color="#374151" />
+            </TouchableOpacity>
           </View>
 
           {/* Settings Content */}
@@ -205,6 +214,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
           </View>
         </View>
       </ScrollView>
+      <Drawer
+        drawerVisible={drawerVisible}
+        setDrawerVisible={setDrawerVisible}
+      />
     </SafeAreaView>
   );
 };

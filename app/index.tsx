@@ -163,7 +163,7 @@ const FitIntervalApp: React.FC = () => {
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View className="flex-row items-center justify-between px-4 py-5 bg-white border-b border-gray-200">
+        <View className="flex-row items-center justify-between px-4 pb-4 bg-white border-b border-gray-200">
           <View className="flex-row items-center">
             <Image
               source={require('../assets/images/fitinterval.png')}
