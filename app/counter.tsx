@@ -377,14 +377,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   mainContent: {
-    flex: 1,
+    flex: 0.8,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
   phaseContainer: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 40,
   },
   phaseText: {
     fontSize: 36,
@@ -463,6 +463,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 16,
+    marginBottom: 16,
   },
   playButton: {
     width: 80,

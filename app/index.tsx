@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,8 @@ import {
   StatusBar,
   Switch,
   Vibration,
+  Animated,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -25,13 +27,37 @@ interface TimerSettings {
 const FitIntervalApp: React.FC = () => {
   const router = useRouter();
   const [settings, setSettings] = useState<TimerSettings>({
-    workTime: { minutes: 0, seconds: 45 },
-    restTime: { minutes: 0, seconds: 15 },
-    sets: 8,
+    workTime: { minutes: 1, seconds: 30 },
+    restTime: { minutes: 1, seconds: 0 },
+    sets: 4,
     soundEnabled: true,
     vibrationEnabled: true,
     keepScreenOn: false,
   });
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const drawerWidth = Dimensions.get('window').width * 0.7;
+  const slideAnim = useRef(new Animated.Value(drawerWidth)).current;
+
+  useEffect(() => {
+    if (drawerVisible) {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [drawerVisible]);
+
+  const closeDrawer = () => {
+    Animated.timing(slideAnim, {
+      toValue: drawerWidth,
+      duration: 250,
+      useNativeDriver: true,
+    }).start(() => {
+      setDrawerVisible(false);
+    });
+  };
 
   const [showOptions, setShowOptions] = useState(false);
   const [timePickerModal, setTimePickerModal] = useState({
@@ -164,8 +190,11 @@ const FitIntervalApp: React.FC = () => {
               FitInterval
             </Text>
           </View>
-          <TouchableOpacity className="w-10 h-10 items-center justify-center rounded-full bg-gray-100">
-            <Ionicons name="settings" size={20} color="#374151" />
+          <TouchableOpacity
+            onPress={() => setDrawerVisible(true)}
+            className="w-10 h-10 items-center justify-center rounded-full "
+          >
+            <Ionicons name="menu" size={20} color="#374151" />
           </TouchableOpacity>
         </View>
 
@@ -289,7 +318,7 @@ const FitIntervalApp: React.FC = () => {
             </View>
 
             {showOptions && (
-              <View className="bg-gray-50 rounded-xl p-4 space-y-4">
+              <View className="bg-gray-50 rounded-xl p-4 space-y-4 flex gap-3">
                 {/* Sound Toggle */}
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center">
@@ -471,6 +500,73 @@ const FitIntervalApp: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+      </Modal>
+
+      {/* Drawer Menu Modal */}
+      <Modal
+        visible={drawerVisible}
+        transparent={true}
+        animationType="none"
+        onRequestClose={closeDrawer}
+      >
+        <TouchableOpacity
+          className="flex-1 bg-black/20"
+          activeOpacity={1}
+          onPressOut={closeDrawer}
+        >
+          <Animated.View
+            style={[
+              {
+                width: drawerWidth,
+                transform: [{ translateX: slideAnim }],
+              },
+            ]}
+            className="h-full bg-white shadow-2xl ml-auto rounded-2xl"
+          >
+            <TouchableOpacity activeOpacity={1} className="flex-1">
+              <SafeAreaView className="flex-1 p-5">
+                <View className="flex-row justify-between items-center mb-8">
+                  <Text className="text-xl font-bold text-gray-800">Menu</Text>
+                  <TouchableOpacity
+                    onPress={closeDrawer}
+                    className="w-8 h-8 items-center justify-center rounded-full bg-gray-100"
+                  >
+                    <Ionicons name="close" size={16} color="#374151" />
+                  </TouchableOpacity>
+                </View>
+
+                <View className="space-y-6">
+                  <TouchableOpacity className="flex-row items-center">
+                    <Ionicons
+                      name="settings-outline"
+                      size={22}
+                      color="#374151"
+                    />
+                    <Text className="text-lg ml-4 text-gray-700">Settings</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity className="flex-row items-center">
+                    <Ionicons
+                      name="share-social-outline"
+                      size={22}
+                      color="#374151"
+                    />
+                    <Text className="text-lg ml-4 text-gray-700">
+                      Share App
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity className="flex-row items-center">
+                    <Ionicons
+                      name="information-circle-outline"
+                      size={22}
+                      color="#374151"
+                    />
+                    <Text className="text-lg ml-4 text-gray-700">About</Text>
+                  </TouchableOpacity>
+                </View>
+              </SafeAreaView>
+            </TouchableOpacity>
+          </Animated.View>
+        </TouchableOpacity>
       </Modal>
     </SafeAreaView>
   );
