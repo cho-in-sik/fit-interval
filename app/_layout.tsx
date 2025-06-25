@@ -41,6 +41,7 @@ export default function RootLayout() {
         <PaperProvider>
           <Stack>
             <Stack.Screen name="counter" options={{ headerShown: false }} />
+            <Stack.Screen name="records" options={{ headerShown: false }} />
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="settings" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
