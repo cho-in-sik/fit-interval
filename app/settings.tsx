@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,27 +13,52 @@ import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from '@/components/Drawer';
+import { useSettingsStore } from '@/store/settingsStore';
 
 interface SettingsScreenProps {
   onBack?: () => void;
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const [volume, setVolume] = useState(75);
-  const [vibrationEnabled, setVibrationEnabled] = useState(true);
+  const {
+    audio,
+    setSoundEnabled,
+    setVolume,
+    setVoiceEnabled,
+    setVibrationEnabled,
+  } = useSettingsStore();
 
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [soundEnabled, setSoundEnabledLocal] = useState(audio.soundEnabled);
+  const [voiceEnabled, setVoiceEnabledLocal] = useState(audio.voiceEnabled);
+  const [volume, setVolumeLocal] = useState(audio.volume);
+  const [vibrationEnabled, setVibrationEnabledLocal] = useState(audio.vibrationEnabled);
+
+  useEffect(() => {
+    setSoundEnabledLocal(audio.soundEnabled);
+    setVoiceEnabledLocal(audio.voiceEnabled);
+    setVolumeLocal(audio.volume);
+    setVibrationEnabledLocal(audio.vibrationEnabled);
+  }, [audio]);
+
+  const handleSoundToggle = (value: boolean) => {
+    setSoundEnabledLocal(value);
+    setSoundEnabled(value);
+  };
 
   const handleVoiceToggle = (value: boolean) => {
+    setVoiceEnabledLocal(value);
     setVoiceEnabled(value);
   };
 
   const handleVolumeChange = (value: number) => {
-    setVolume(Math.round(value));
+    const roundedValue = Math.round(value);
+    setVolumeLocal(roundedValue);
+    setVolume(roundedValue);
   };
 
   const handleVibrationToggle = (value: boolean) => {
+    setVibrationEnabledLocal(value);
     setVibrationEnabled(value);
     if (value) {
       Vibration.vibrate(50);
@@ -84,13 +109,45 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
                 Audio
               </Text>
 
-              {/* Voice Toggle */}
+              {/* Sound Toggle */}
               <View className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 mb-4">
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center flex-1">
                     <View className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4">
                       <Icon
-                        name="volume-high"
+                        name={soundEnabled ? "volume-high" : "volume-xmark"}
+                        size={16}
+                        color="#007AFF"
+                        solid
+                      />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-base font-medium text-neutral-800">
+                        Sound
+                      </Text>
+                      <Text className="text-sm text-neutral-600">
+                        Enable all audio sounds
+                      </Text>
+                    </View>
+                  </View>
+                  <Switch
+                    value={soundEnabled}
+                    onValueChange={handleSoundToggle}
+                    trackColor={{ false: '#D1D5DB', true: '#007AFF' }}
+                    thumbColor="#FFFFFF"
+                  />
+                </View>
+              </View>
+
+              {/* Voice Toggle */}
+              <View className={`bg-white rounded-xl shadow-sm border border-neutral-200 p-4 mb-4 ${
+                !soundEnabled ? 'opacity-50' : 'opacity-100'
+              }`}>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center flex-1">
+                    <View className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4">
+                      <Icon
+                        name="microphone"
                         size={16}
                         color="#007AFF"
                         solid
@@ -106,10 +163,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
                     </View>
                   </View>
                   <Switch
-                    value={voiceEnabled}
+                    value={voiceEnabled && soundEnabled}
                     onValueChange={handleVoiceToggle}
                     trackColor={{ false: '#D1D5DB', true: '#007AFF' }}
                     thumbColor="#FFFFFF"
+                    disabled={!soundEnabled}
                   />
                 </View>
               </View>
@@ -117,7 +175,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
               {/* Volume Control */}
               <View
                 className={`bg-white rounded-xl shadow-sm border border-neutral-200 p-4 ${
-                  !voiceEnabled ? 'opacity-50' : 'opacity-100'
+                  !soundEnabled ? 'opacity-50' : 'opacity-100'
                 }`}
               >
                 <View className="flex-row items-center mb-4">
@@ -149,7 +207,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
                       minimumTrackTintColor="#007AFF"
                       maximumTrackTintColor="#E5E7EB"
                       thumbTintColor="#007AFF"
-                      disabled={!voiceEnabled}
+                      disabled={!soundEnabled}
                     />
                   </View>
                   <Icon name="volume-high" size={14} color="#9CA3AF" solid />

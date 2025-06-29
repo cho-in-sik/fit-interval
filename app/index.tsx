@@ -16,6 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Drawer from '@/components/Drawer';
+import { useSettingsStore } from '@/store/settingsStore';
 
 interface TimerSettings {
   workTime: { minutes: number; seconds: number };
@@ -28,14 +29,28 @@ interface TimerSettings {
 
 const FitIntervalApp: React.FC = () => {
   const router = useRouter();
+  const { audio, timer, setTimerSettings } = useSettingsStore();
+  
   const [settings, setSettings] = useState<TimerSettings>({
-    workTime: { minutes: 1, seconds: 30 },
-    restTime: { minutes: 1, seconds: 0 },
-    sets: 4,
-    soundEnabled: true,
-    vibrationEnabled: true,
-    keepScreenOn: false,
+    workTime: timer.workTime,
+    restTime: timer.restTime,
+    sets: timer.sets,
+    soundEnabled: audio.soundEnabled,
+    vibrationEnabled: audio.vibrationEnabled,
+    keepScreenOn: timer.keepScreenOn,
   });
+
+  // Sync settings with global store when they change
+  useEffect(() => {
+    setSettings({
+      workTime: timer.workTime,
+      restTime: timer.restTime,
+      sets: timer.sets,
+      soundEnabled: audio.soundEnabled,
+      vibrationEnabled: audio.vibrationEnabled,
+      keepScreenOn: timer.keepScreenOn,
+    });
+  }, [audio, timer]);
 
   const [drawerVisible, setDrawerVisible] = useState(false);
 
@@ -87,22 +102,17 @@ const FitIntervalApp: React.FC = () => {
   };
 
   const confirmTimePicker = () => {
+    const newTime = {
+      minutes: timePickerModal.minutes,
+      seconds: timePickerModal.seconds,
+    };
+    
     if (timePickerModal.type === 'work') {
-      setSettings((prev) => ({
-        ...prev,
-        workTime: {
-          minutes: timePickerModal.minutes,
-          seconds: timePickerModal.seconds,
-        },
-      }));
+      setSettings((prev) => ({ ...prev, workTime: newTime }));
+      setTimerSettings({ workTime: newTime });
     } else {
-      setSettings((prev) => ({
-        ...prev,
-        restTime: {
-          minutes: timePickerModal.minutes,
-          seconds: timePickerModal.seconds,
-        },
-      }));
+      setSettings((prev) => ({ ...prev, restTime: newTime }));
+      setTimerSettings({ restTime: newTime });
     }
     setTimePickerModal((prev) => ({ ...prev, visible: false }));
   };
@@ -124,33 +134,32 @@ const FitIntervalApp: React.FC = () => {
   };
 
   const adjustSets = (direction: 'up' | 'down') => {
-    setSettings((prev) => ({
-      ...prev,
-      sets: Math.max(
-        1,
-        Math.min(99, prev.sets + (direction === 'up' ? 1 : -1)),
-      ),
-    }));
+    const newSets = Math.max(
+      1,
+      Math.min(99, settings.sets + (direction === 'up' ? 1 : -1)),
+    );
+    setSettings((prev) => ({ ...prev, sets: newSets }));
+    setTimerSettings({ sets: newSets });
   };
 
   const startTimer = () => {
-    if (settings.vibrationEnabled) {
+    if (audio.vibrationEnabled) {
       Vibration.vibrate(100);
     }
     const workSeconds =
-      settings.workTime.minutes * 60 + settings.workTime.seconds;
+      timer.workTime.minutes * 60 + timer.workTime.seconds;
     const restSeconds =
-      settings.restTime.minutes * 60 + settings.restTime.seconds;
+      timer.restTime.minutes * 60 + timer.restTime.seconds;
 
     router.push({
       pathname: '/counter',
       params: {
         workTime: workSeconds,
         restTime: restSeconds,
-        sets: settings.sets,
-        soundEnabled: settings.soundEnabled.toString(),
-        vibrationEnabled: settings.vibrationEnabled.toString(),
-        keepScreenOn: settings.keepScreenOn.toString(),
+        sets: timer.sets,
+        soundEnabled: audio.soundEnabled.toString(),
+        vibrationEnabled: audio.vibrationEnabled.toString(),
+        keepScreenOn: timer.keepScreenOn.toString(),
       },
     });
   };

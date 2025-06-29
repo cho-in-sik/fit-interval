@@ -13,7 +13,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { useKeepAwake } from 'expo-keep-awake';
+import { useSettingsStore } from '@/store/settingsStore';
+import { audioService } from '@/services/audioService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -34,13 +36,14 @@ interface TimerState {
 const FitIntervalTimer: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { audio, timer } = useSettingsStore();
 
-  const workTime = parseInt((params.workTime as string) || '45', 10);
-  const restTime = parseInt((params.restTime as string) || '15', 10);
-  const totalSets = parseInt((params.sets as string) || '8', 10);
-  const soundEnabled = params.soundEnabled === 'true';
-  const vibrationEnabled = params.vibrationEnabled === 'true';
-  const keepScreenOn = params.keepScreenOn === 'true';
+  const workTime = parseInt((params.workTime as string) || (timer.workTime.minutes * 60 + timer.workTime.seconds).toString(), 10);
+  const restTime = parseInt((params.restTime as string) || (timer.restTime.minutes * 60 + timer.restTime.seconds).toString(), 10);
+  const totalSets = parseInt((params.sets as string) || timer.sets.toString(), 10);
+  const soundEnabled = params.soundEnabled === 'true' || audio.soundEnabled;
+  const vibrationEnabled = params.vibrationEnabled === 'true' || audio.vibrationEnabled;
+  const keepScreenOn = params.keepScreenOn === 'true' || timer.keepScreenOn;
 
   const [state, setState] = useState<TimerState>({
     isRunning: true,
@@ -58,18 +61,25 @@ const FitIntervalTimer: React.FC = () => {
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const audioInitialized = useRef(false);
 
-  // keep screen on effect
+  // Initialize audio service
   useEffect(() => {
-    if (state.keepScreenOn) {
-      activateKeepAwakeAsync();
-    }
-    return () => {
-      if (state.keepScreenOn) {
-        deactivateKeepAwake();
+    const initAudio = async () => {
+      if (!audioInitialized.current) {
+        await audioService.initialize();
+        audioInitialized.current = true;
       }
     };
-  }, [state.keepScreenOn]);
+    initAudio();
+
+    return () => {
+      audioService.cleanup();
+    };
+  }, []);
+
+  // Keep screen awake when enabled
+  useKeepAwake(state.keepScreenOn ? 'timer-session' : undefined);
 
   // Pulse animation for timer
   const startPulse = () => {
@@ -101,9 +111,22 @@ const FitIntervalTimer: React.FC = () => {
           const newTimeRemaining = prev.timeRemaining - 1;
 
           if (newTimeRemaining === 0) {
-            // Vibrate on phase completion
+            // Audio and haptic feedback on phase completion
             if (prev.vibrationEnabled) {
-              Vibration.vibrate([200, 100, 200]);
+              audioService.triggerHapticFeedback(true, 'medium');
+            }
+
+            // Play sound based on phase
+            if (prev.currentPhase === 'work') {
+              audioService.playRestSound(audio.volume, prev.soundEnabled);
+              if (audio.voiceEnabled && prev.soundEnabled) {
+                audioService.playVoiceGuidance('Rest time', audio.volume, audio.voiceEnabled, prev.soundEnabled);
+              }
+            } else {
+              audioService.playWorkSound(audio.volume, prev.soundEnabled);
+              if (audio.voiceEnabled && prev.soundEnabled) {
+                audioService.playVoiceGuidance('Work time', audio.volume, audio.voiceEnabled, prev.soundEnabled);
+              }
             }
 
             if (
@@ -126,7 +149,13 @@ const FitIntervalTimer: React.FC = () => {
                 };
               }
             } else {
-              // Workout complete
+              // Workout complete - play end sound
+              audioService.playEndSound(audio.volume, prev.soundEnabled);
+              if (audio.voiceEnabled && prev.soundEnabled) {
+                audioService.playVoiceGuidance('Workout complete', audio.volume, audio.voiceEnabled, prev.soundEnabled);
+              }
+              audioService.triggerHapticFeedback(prev.vibrationEnabled, 'heavy');
+              
               return {
                 ...prev,
                 isRunning: false,
@@ -154,14 +183,22 @@ const FitIntervalTimer: React.FC = () => {
     };
   }, [state.isRunning, state.isPaused, state.timeRemaining]);
 
-  // Pulse effect for last 3 seconds
+  // Pulse effect and countdown sounds for last 3 seconds
   useEffect(() => {
     if (state.timeRemaining <= 3 && state.timeRemaining > 0) {
       startPulse();
+      // Play countdown beep
+      if (audio.soundEnabled) {
+        audioService.playWorkSound(audio.volume * 0.5, true);
+      }
+      // Light haptic feedback for countdown
+      if (audio.vibrationEnabled) {
+        audioService.triggerHapticFeedback(true, 'light');
+      }
     } else {
       stopPulse();
     }
-  }, [state.timeRemaining]);
+  }, [state.timeRemaining, audio.soundEnabled, audio.vibrationEnabled, audio.volume]);
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -188,16 +225,28 @@ const FitIntervalTimer: React.FC = () => {
 
   const handlePausePlay = () => {
     setState((prev) => ({ ...prev, isPaused: !prev.isPaused }));
+    // Light haptic feedback for button press
+    if (audio.vibrationEnabled) {
+      audioService.triggerHapticFeedback(true, 'light');
+    }
   };
 
   const handleReset = () => {
     const resetTime =
       state.currentPhase === 'work' ? state.workTime : state.restTime;
     setState((prev) => ({ ...prev, timeRemaining: resetTime }));
+    // Light haptic feedback for button press
+    if (audio.vibrationEnabled) {
+      audioService.triggerHapticFeedback(true, 'light');
+    }
   };
 
   const handleSkip = () => {
     setState((prev) => ({ ...prev, timeRemaining: 0 }));
+    // Light haptic feedback for button press
+    if (audio.vibrationEnabled) {
+      audioService.triggerHapticFeedback(true, 'light');
+    }
   };
 
   const renderSetDots = () => {
