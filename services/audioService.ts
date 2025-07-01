@@ -1,5 +1,6 @@
 import { Audio, AVPlaybackSource } from 'expo-av';
 import * as Haptics from 'expo-haptics';
+import { permissionService } from './permissionService';
 
 class AudioService {
   private workSound: Audio.Sound | null = null;
@@ -44,6 +45,9 @@ class AudioService {
   async playWorkSound(volume: number = 1.0, soundEnabled: boolean = true) {
     if (!soundEnabled || !this.workSound) return;
 
+    const hasPermission = await permissionService.requestAudioPermission();
+    if (!hasPermission) return;
+
     try {
       await this.workSound.setVolumeAsync(volume / 100);
       await this.workSound.replayAsync();
@@ -55,6 +59,9 @@ class AudioService {
   async playRestSound(volume: number = 1.0, soundEnabled: boolean = true) {
     if (!soundEnabled || !this.restSound) return;
 
+    const hasPermission = await permissionService.requestAudioPermission();
+    if (!hasPermission) return;
+
     try {
       await this.restSound.setVolumeAsync(volume / 100);
       await this.restSound.replayAsync();
@@ -65,6 +72,9 @@ class AudioService {
 
   async playEndSound(volume: number = 1.0, soundEnabled: boolean = true) {
     if (!soundEnabled || !this.endSound) return;
+
+    const hasPermission = await permissionService.requestAudioPermission();
+    if (!hasPermission) return;
 
     try {
       await this.endSound.setVolumeAsync(volume / 100);
@@ -82,8 +92,9 @@ class AudioService {
   ) {
     if (!soundEnabled || !voiceEnabled) return;
 
-    // Voice synthesis would go here
-    // For now, we'll just play a generic sound
+    const hasPermission = await permissionService.requestAudioPermission();
+    if (!hasPermission) return;
+
     try {
       if (text.toLowerCase().includes('work') || text.toLowerCase().includes('start')) {
         await this.playWorkSound(volume, soundEnabled);
@@ -102,6 +113,9 @@ class AudioService {
     intensity: 'light' | 'medium' | 'heavy' = 'medium'
   ) {
     if (!vibrationEnabled) return;
+
+    const hasPermission = await permissionService.requestHapticsPermission();
+    if (!hasPermission) return;
 
     try {
       switch (intensity) {
