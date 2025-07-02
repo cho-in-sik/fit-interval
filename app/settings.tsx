@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
-  Vibration,
   SafeAreaView,
   Image,
 } from 'react-native';
@@ -14,12 +13,12 @@ import Icon from 'react-native-vector-icons/FontAwesome6';
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from '@/components/Drawer';
 import { useSettingsStore } from '@/store/settingsStore';
+import { permissionService } from '@/services/permissionService';
+import { audioService } from '@/services/audioService';
 
-interface SettingsScreenProps {
-  onBack?: () => void;
-}
+interface SettingsScreenProps {}
 
-const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
+const SettingsScreen: React.FC<SettingsScreenProps> = () => {
   const {
     audio,
     setSoundEnabled,
@@ -41,7 +40,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
     setVibrationEnabledLocal(audio.vibrationEnabled);
   }, [audio]);
 
-  const handleSoundToggle = (value: boolean) => {
+  const handleSoundToggle = async (value: boolean) => {
+    if (value) {
+      const hasPermission = await permissionService.requestAudioPermission();
+      if (!hasPermission) {
+        setSoundEnabledLocal(false);
+        setSoundEnabled(false);
+        return;
+      }
+    }
     setSoundEnabledLocal(value);
     setSoundEnabled(value);
   };
@@ -57,20 +64,27 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
     setVolume(roundedValue);
   };
 
-  const handleVibrationToggle = (value: boolean) => {
-    setVibrationEnabledLocal(value);
-    setVibrationEnabled(value);
-    if (value) {
-      Vibration.vibrate(50);
+  const handleVolumeTest = async () => {
+    if (soundEnabled) {
+      await audioService.initialize();
+      await audioService.playWorkSound(volume, true);
     }
   };
 
-  const handleBackPress = () => {
-    if (onBack) {
-      onBack();
+  const handleVibrationToggle = async (value: boolean) => {
+    if (value) {
+      const hasPermission = await permissionService.requestHapticsPermission();
+      if (!hasPermission) {
+        setVibrationEnabledLocal(false);
+        setVibrationEnabled(false);
+        return;
+      }
+      await audioService.triggerHapticFeedback(true, 'medium');
     }
-    console.log('Navigate back to home screen');
+    setVibrationEnabledLocal(value);
+    setVibrationEnabled(value);
   };
+
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -204,6 +218,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
                       maximumValue={100}
                       value={volume}
                       onValueChange={handleVolumeChange}
+                      onSlidingComplete={handleVolumeTest}
                       minimumTrackTintColor="#007AFF"
                       maximumTrackTintColor="#E5E7EB"
                       thumbTintColor="#007AFF"

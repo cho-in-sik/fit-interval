@@ -1,5 +1,4 @@
 import { Audio } from 'expo-av';
-import * as Haptics from 'expo-haptics';
 import { Alert, Platform } from 'react-native';
 
 export interface PermissionStatus {
@@ -15,7 +14,7 @@ class PermissionService {
 
   async checkAudioPermission(): Promise<boolean> {
     try {
-      const { status } = await Audio.requestPermissionsAsync();
+      const { status } = await Audio.getPermissionsAsync();
       this.permissionStatus.audio = status === 'granted';
       return this.permissionStatus.audio;
     } catch (error) {
@@ -39,30 +38,21 @@ class PermissionService {
   }
 
   async requestAudioPermission(): Promise<boolean> {
-    if (this.permissionStatus.audio) {
-      return true;
+    try {
+      const { status: currentStatus } = await Audio.getPermissionsAsync();
+      
+      if (currentStatus === 'granted') {
+        this.permissionStatus.audio = true;
+        return true;
+      }
+      
+      const { status } = await Audio.requestPermissionsAsync();
+      this.permissionStatus.audio = status === 'granted';
+      return this.permissionStatus.audio;
+    } catch (error) {
+      console.error('Failed to request audio permission:', error);
+      return false;
     }
-
-    return new Promise((resolve) => {
-      Alert.alert(
-        '오디오 권한 필요',
-        '타이머 알림음을 재생하려면 오디오 권한이 필요합니다.',
-        [
-          {
-            text: '취소',
-            onPress: () => resolve(false),
-            style: 'cancel',
-          },
-          {
-            text: '허용',
-            onPress: async () => {
-              const granted = await this.checkAudioPermission();
-              resolve(granted);
-            },
-          },
-        ]
-      );
-    });
   }
 
   async requestHapticsPermission(): Promise<boolean> {

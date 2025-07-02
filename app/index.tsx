@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Drawer from '@/components/Drawer';
 import { useSettingsStore } from '@/store/settingsStore';
+import { permissionService } from '@/services/permissionService';
 
 interface TimerSettings {
   workTime: { minutes: number; seconds: number };
@@ -142,10 +143,28 @@ const FitIntervalApp: React.FC = () => {
     setTimerSettings({ sets: newSets });
   };
 
-  const startTimer = () => {
+  const startTimer = async () => {
+    let canProceed = true;
+    
+    if (audio.soundEnabled) {
+      const hasAudioPermission = await permissionService.requestAudioPermission();
+      if (!hasAudioPermission) {
+        canProceed = false;
+      }
+    }
+    
     if (audio.vibrationEnabled) {
+      const hasHapticsPermission = await permissionService.requestHapticsPermission();
+      if (!hasHapticsPermission) {
+        canProceed = false;
+      }
       Vibration.vibrate(100);
     }
+    
+    if (!canProceed) {
+      return;
+    }
+    
     const workSeconds =
       timer.workTime.minutes * 60 + timer.workTime.seconds;
     const restSeconds =
