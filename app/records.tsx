@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,11 +11,29 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from '@/components/Drawer';
+import { workoutStorage, WorkoutRecord } from '@/utils/workoutStorage';
 
 const WorkoutHistoryScreen: React.FC = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [workoutRecords, setWorkoutRecords] = useState<WorkoutRecord[]>([]);
+  const [stats, setStats] = useState({ totalTime: 0, totalWorkouts: 0 });
+
+  useEffect(() => {
+    loadWorkouts();
+  }, []);
+
+  const loadWorkouts = async () => {
+    try {
+      const records = await workoutStorage.getWorkouts();
+      setWorkoutRecords(records);
+      const workoutStats = workoutStorage.getTotalStats(records);
+      setStats(workoutStats);
+    } catch (error) {
+      console.error('Error loading workouts:', error);
+    }
+  };
+
   const handleBackPress = () => {
-    // 네비게이션 백 로직
     console.log('Back pressed');
   };
 
@@ -23,68 +41,37 @@ const WorkoutHistoryScreen: React.FC = () => {
     Alert.alert('업그레이드', '업그레이드 기능이 곧 출시됩니다!');
   };
 
-  const workoutData = [
-    {
-      id: 1,
-      title: "Today's Workout",
-      date: 'Dec 22, 2024 • 3:45 PM',
-      duration: '08:30',
-      sets: '8 sets',
-      work: '45s',
-      rest: '15s',
-      icon: 'barbell' as const,
-      bgColor: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-    },
-    {
-      id: 2,
-      title: 'HIIT Session',
-      date: 'Dec 21, 2024 • 7:20 AM',
-      duration: '06:15',
-      sets: '6 sets',
-      work: '30s',
-      rest: '30s',
-      icon: 'flame' as const,
-      bgColor: 'bg-green-50',
-      iconColor: 'text-green-600',
-    },
-    {
-      id: 3,
-      title: 'Quick Burn',
-      date: 'Dec 20, 2024 • 6:15 PM',
-      duration: '04:45',
-      sets: '5 sets',
-      work: '20s',
-      rest: '20s',
-      icon: 'flash' as const,
-      bgColor: 'bg-orange-50',
-      iconColor: 'text-orange-600',
-    },
-    {
-      id: 4,
-      title: 'Cardio Blast',
-      date: 'Dec 19, 2024 • 8:30 AM',
-      duration: '03:20',
-      sets: '4 sets',
-      work: '25s',
-      rest: '25s',
-      icon: 'heart' as const,
-      bgColor: 'bg-purple-50',
-      iconColor: 'text-purple-600',
-    },
-    {
-      id: 5,
-      title: 'Morning Run',
-      date: 'Dec 18, 2024 • 6:45 AM',
-      duration: '01:55',
-      sets: '3 sets',
-      work: '15s',
-      rest: '15s',
-      icon: 'walk' as const,
-      bgColor: 'bg-blue-50',
-      iconColor: 'text-blue-600',
-    },
-  ];
+  const formatDuration = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds
+      .toString()
+      .padStart(2, '0')}`;
+  };
+
+  const formatTimeText = (seconds: number): string => {
+    if (seconds < 60) {
+      return `${seconds}s`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+  };
+
+  const getIconForWorkout = (index: number) => {
+    const icons = ['barbell', 'flame', 'flash', 'heart', 'walk'] as const;
+    return icons[index % icons.length];
+  };
+
+  const getBgColorForWorkout = (index: number) => {
+    const colors = ['bg-blue-50', 'bg-green-50', 'bg-orange-50', 'bg-purple-50', 'bg-indigo-50'];
+    return colors[index % colors.length];
+  };
+
+  const getIconColorForWorkout = (index: number) => {
+    const colors = ['#2563EB', '#059669', '#EA580C', '#9333EA', '#4F46E5'];
+    return colors[index % colors.length];
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -126,7 +113,7 @@ const WorkoutHistoryScreen: React.FC = () => {
                   <Ionicons name="time" size={20} color="#3B82F6" />
                 </View>
                 <Text className="text-xs text-gray-600 mb-1">Total Time</Text>
-                <Text className="text-2xl font-bold text-blue-600">24:35</Text>
+                <Text className="text-2xl font-bold text-blue-600">{formatDuration(stats.totalTime)}</Text>
               </View>
 
               {/* Completed Workouts */}
@@ -135,7 +122,7 @@ const WorkoutHistoryScreen: React.FC = () => {
                   <Ionicons name="trophy" size={20} color="#059669" />
                 </View>
                 <Text className="text-xs text-gray-600 mb-1">Completed</Text>
-                <Text className="text-2xl font-bold text-green-600">5</Text>
+                <Text className="text-2xl font-bold text-green-600">{stats.totalWorkouts}</Text>
               </View>
             </View>
           </View>
@@ -152,60 +139,62 @@ const WorkoutHistoryScreen: React.FC = () => {
             </View>
 
             <View className="space-y-3">
-              {workoutData.map((workout) => (
-                <View
-                  key={workout.id}
-                  className="bg-white rounded-xl border border-gray-200 p-4 mb-3"
-                >
-                  <View className="flex-row items-center justify-between mb-3">
-                    <View className="flex-row items-center flex-1">
-                      <View
-                        className={`w-10 h-10 ${workout.bgColor} rounded-full flex items-center justify-center mr-3`}
-                      >
-                        <Ionicons
-                          name={workout.icon}
-                          size={16}
-                          color={
-                            workout.iconColor.includes('blue')
-                              ? '#2563EB'
-                              : workout.iconColor.includes('green')
-                              ? '#059669'
-                              : workout.iconColor.includes('orange')
-                              ? '#EA580C'
-                              : workout.iconColor.includes('purple')
-                              ? '#9333EA'
-                              : '#2563EB'
-                          }
-                        />
+              {workoutRecords.length === 0 ? (
+                <View className="bg-gray-50 rounded-xl p-8 items-center">
+                  <Ionicons name="fitness" size={48} color="#9CA3AF" />
+                  <Text className="text-gray-500 text-center mt-4 text-base">
+                    No workouts yet
+                  </Text>
+                  <Text className="text-gray-400 text-center mt-2 text-sm">
+                    Complete your first workout to see it here!
+                  </Text>
+                </View>
+              ) : (
+                workoutRecords.map((workout, index) => (
+                  <View
+                    key={workout.id}
+                    className="bg-white rounded-xl border border-gray-200 p-4 mb-3"
+                  >
+                    <View className="flex-row items-center justify-between mb-3">
+                      <View className="flex-row items-center flex-1">
+                        <View
+                          className={`w-10 h-10 ${getBgColorForWorkout(index)} rounded-full flex items-center justify-center mr-3`}
+                        >
+                          <Ionicons
+                            name={getIconForWorkout(index)}
+                            size={16}
+                            color={getIconColorForWorkout(index)}
+                          />
+                        </View>
+                        <View className="flex-1">
+                          <Text className="font-medium text-gray-800">
+                            {workout.title}
+                          </Text>
+                          <Text className="text-xs text-gray-600">
+                            {workout.date}
+                          </Text>
+                        </View>
                       </View>
-                      <View className="flex-1">
-                        <Text className="font-medium text-gray-800">
-                          {workout.title}
+                      <View className="items-end">
+                        <Text className="text-sm font-semibold text-gray-800">
+                          {formatDuration(workout.duration)}
                         </Text>
                         <Text className="text-xs text-gray-600">
-                          {workout.date}
+                          {workout.sets} sets
                         </Text>
                       </View>
                     </View>
-                    <View className="items-end">
-                      <Text className="text-sm font-semibold text-gray-800">
-                        {workout.duration}
+                    <View className="flex-row items-center">
+                      <Text className="text-xs text-gray-600 mr-4">
+                        Work: {formatTimeText(workout.workTime)}
                       </Text>
                       <Text className="text-xs text-gray-600">
-                        {workout.sets}
+                        Rest: {formatTimeText(workout.restTime)}
                       </Text>
                     </View>
                   </View>
-                  <View className="flex-row items-center">
-                    <Text className="text-xs text-gray-600 mr-4">
-                      Work: {workout.work}
-                    </Text>
-                    <Text className="text-xs text-gray-600">
-                      Rest: {workout.rest}
-                    </Text>
-                  </View>
-                </View>
-              ))}
+                ))
+              )}
             </View>
           </View>
 

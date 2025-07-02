@@ -49,8 +49,10 @@ class AudioService {
     if (!hasPermission) return;
 
     try {
+      await this.workSound.stopAsync();
+      await this.workSound.setPositionAsync(0);
       await this.workSound.setVolumeAsync(volume / 100);
-      await this.workSound.replayAsync();
+      await this.workSound.playAsync();
     } catch (error) {
       console.error('Failed to play work sound:', error);
     }
@@ -63,8 +65,10 @@ class AudioService {
     if (!hasPermission) return;
 
     try {
+      await this.restSound.stopAsync();
+      await this.restSound.setPositionAsync(0);
       await this.restSound.setVolumeAsync(volume / 100);
-      await this.restSound.replayAsync();
+      await this.restSound.playAsync();
     } catch (error) {
       console.error('Failed to play rest sound:', error);
     }
@@ -77,8 +81,10 @@ class AudioService {
     if (!hasPermission) return;
 
     try {
+      await this.endSound.stopAsync();
+      await this.endSound.setPositionAsync(0);
       await this.endSound.setVolumeAsync(volume / 100);
-      await this.endSound.replayAsync();
+      await this.endSound.playAsync();
     } catch (error) {
       console.error('Failed to play end sound:', error);
     }

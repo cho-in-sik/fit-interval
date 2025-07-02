@@ -16,6 +16,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useSettingsStore } from '@/store/settingsStore';
 import { audioService } from '@/services/audioService';
+import WorkoutCompleteModal from '@/components/WorkoutCompleteModal';
+import { workoutStorage } from '@/utils/workoutStorage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -58,6 +60,9 @@ const FitIntervalTimer: React.FC = () => {
     vibrationEnabled: vibrationEnabled,
     keepScreenOn: keepScreenOn,
   });
+
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [startTime] = useState(Date.now());
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -116,13 +121,8 @@ const FitIntervalTimer: React.FC = () => {
               audioService.triggerHapticFeedback(true, 'medium');
             }
 
-            // Play sound based on phase
-            if (prev.currentPhase === 'work') {
-              audioService.playRestSound(audio.volume, prev.soundEnabled);
-              if (audio.voiceEnabled && prev.soundEnabled) {
-                audioService.playVoiceGuidance('Rest time', audio.volume, audio.voiceEnabled, prev.soundEnabled);
-              }
-            } else {
+            // Only play sound for work phase
+            if (prev.currentPhase === 'rest') {
               audioService.playWorkSound(audio.volume, prev.soundEnabled);
               if (audio.voiceEnabled && prev.soundEnabled) {
                 audioService.playVoiceGuidance('Work time', audio.volume, audio.voiceEnabled, prev.soundEnabled);
@@ -149,12 +149,11 @@ const FitIntervalTimer: React.FC = () => {
                 };
               }
             } else {
-              // Workout complete - play end sound
-              audioService.playEndSound(audio.volume, prev.soundEnabled);
-              if (audio.voiceEnabled && prev.soundEnabled) {
-                audioService.playVoiceGuidance('Workout complete', audio.volume, audio.voiceEnabled, prev.soundEnabled);
-              }
+              // Workout complete - only vibration
               audioService.triggerHapticFeedback(prev.vibrationEnabled, 'heavy');
+              
+              // Show completion modal
+              setShowCompleteModal(true);
               
               return {
                 ...prev,
@@ -183,22 +182,18 @@ const FitIntervalTimer: React.FC = () => {
     };
   }, [state.isRunning, state.isPaused, state.timeRemaining]);
 
-  // Pulse effect and countdown sounds for last 3 seconds
+  // Pulse effect and vibration for last 3 seconds
   useEffect(() => {
     if (state.timeRemaining <= 3 && state.timeRemaining > 0) {
       startPulse();
-      // Play countdown beep
-      if (audio.soundEnabled) {
-        audioService.playWorkSound(audio.volume * 0.5, true);
-      }
-      // Light haptic feedback for countdown
+      // Only vibration for countdown
       if (audio.vibrationEnabled) {
         audioService.triggerHapticFeedback(true, 'light');
       }
     } else {
       stopPulse();
     }
-  }, [state.timeRemaining, audio.soundEnabled, audio.vibrationEnabled, audio.volume]);
+  }, [state.timeRemaining, audio.vibrationEnabled]);
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -247,6 +242,40 @@ const FitIntervalTimer: React.FC = () => {
     if (audio.vibrationEnabled) {
       audioService.triggerHapticFeedback(true, 'light');
     }
+  };
+
+  const handleWorkoutComplete = async () => {
+    try {
+      const endTime = Date.now();
+      const totalDuration = Math.floor((endTime - startTime) / 1000);
+      
+      const workoutTitle = workoutStorage.formatWorkoutTitle(
+        state.workTime,
+        state.restTime,
+        state.totalSets
+      );
+
+      await workoutStorage.saveWorkout({
+        title: workoutTitle,
+        date: workoutStorage.formatDate(endTime),
+        duration: totalDuration,
+        sets: state.totalSets,
+        workTime: state.workTime,
+        restTime: state.restTime,
+      });
+
+      setShowCompleteModal(false);
+      router.back();
+    } catch (error) {
+      console.error('Error saving workout:', error);
+      setShowCompleteModal(false);
+      router.back();
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowCompleteModal(false);
+    router.back();
   };
 
   const renderSetDots = () => {
@@ -388,6 +417,18 @@ const FitIntervalTimer: React.FC = () => {
           </View>
         </View>
       </LinearGradient>
+
+      <WorkoutCompleteModal
+        visible={showCompleteModal}
+        onDone={handleWorkoutComplete}
+        onClose={handleCloseModal}
+        workoutData={{
+          totalTime: Math.floor((Date.now() - startTime) / 1000),
+          sets: state.totalSets,
+          workTime: state.workTime,
+          restTime: state.restTime,
+        }}
+      />
     </View>
   );
 };
