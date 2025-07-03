@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from '@/components/Drawer';
 import { workoutStorage, WorkoutRecord } from '@/utils/workoutStorage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const WorkoutHistoryScreen: React.FC = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -33,10 +34,6 @@ const WorkoutHistoryScreen: React.FC = () => {
     }
   };
 
-  const handleBackPress = () => {
-    console.log('Back pressed');
-  };
-
   const handleUpgradePress = () => {
     Alert.alert('업그레이드', '업그레이드 기능이 곧 출시됩니다!');
   };
@@ -55,7 +52,9 @@ const WorkoutHistoryScreen: React.FC = () => {
     }
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+    return remainingSeconds > 0
+      ? `${minutes}m ${remainingSeconds}s`
+      : `${minutes}m`;
   };
 
   const getIconForWorkout = (index: number) => {
@@ -64,7 +63,13 @@ const WorkoutHistoryScreen: React.FC = () => {
   };
 
   const getBgColorForWorkout = (index: number) => {
-    const colors = ['bg-blue-50', 'bg-green-50', 'bg-orange-50', 'bg-purple-50', 'bg-indigo-50'];
+    const colors = [
+      'bg-blue-50',
+      'bg-green-50',
+      'bg-orange-50',
+      'bg-purple-50',
+      'bg-indigo-50',
+    ];
     return colors[index % colors.length];
   };
 
@@ -113,7 +118,9 @@ const WorkoutHistoryScreen: React.FC = () => {
                   <Ionicons name="time" size={20} color="#3B82F6" />
                 </View>
                 <Text className="text-xs text-gray-600 mb-1">Total Time</Text>
-                <Text className="text-2xl font-bold text-blue-600">{formatDuration(stats.totalTime)}</Text>
+                <Text className="text-2xl font-bold text-blue-600">
+                  {formatDuration(stats.totalTime)}
+                </Text>
               </View>
 
               {/* Completed Workouts */}
@@ -122,7 +129,9 @@ const WorkoutHistoryScreen: React.FC = () => {
                   <Ionicons name="trophy" size={20} color="#059669" />
                 </View>
                 <Text className="text-xs text-gray-600 mb-1">Completed</Text>
-                <Text className="text-2xl font-bold text-green-600">{stats.totalWorkouts}</Text>
+                <Text className="text-2xl font-bold text-green-600">
+                  {stats.totalWorkouts}
+                </Text>
               </View>
             </View>
           </View>
@@ -158,7 +167,9 @@ const WorkoutHistoryScreen: React.FC = () => {
                     <View className="flex-row items-center justify-between mb-3">
                       <View className="flex-row items-center flex-1">
                         <View
-                          className={`w-10 h-10 ${getBgColorForWorkout(index)} rounded-full flex items-center justify-center mr-3`}
+                          className={`w-10 h-10 ${getBgColorForWorkout(
+                            index,
+                          )} rounded-full flex items-center justify-center mr-3`}
                         >
                           <Ionicons
                             name={getIconForWorkout(index)}
@@ -199,7 +210,12 @@ const WorkoutHistoryScreen: React.FC = () => {
           </View>
 
           {/* Free Plan Limitation */}
-          <View className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-4 items-center">
+          <LinearGradient
+            colors={['#1d4ed8', '#1e40af']} // bg-blue-700 gradient
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ borderRadius: 12, padding: 16, alignItems: 'center' }}
+          >
             <Ionicons
               name="star"
               size={24}
@@ -209,7 +225,7 @@ const WorkoutHistoryScreen: React.FC = () => {
             <Text className="font-semibold text-white mb-1">
               Upgrade to Pro
             </Text>
-            <Text className="text-sm text-blue-100 mb-3 text-center">
+            <Text className="text-sm text-blue-200 mb-3 text-center">
               View unlimited workout history and detailed analytics
             </Text>
             <TouchableOpacity
@@ -221,7 +237,7 @@ const WorkoutHistoryScreen: React.FC = () => {
                 Upgrade Now
               </Text>
             </TouchableOpacity>
-          </View>
+          </LinearGradient>
         </View>
       </ScrollView>
       <Drawer

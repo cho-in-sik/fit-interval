@@ -45,7 +45,9 @@ const WorkoutCompleteModal: React.FC<WorkoutCompleteModalProps> = ({
     }
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+    return remainingSeconds > 0
+      ? `${minutes}m ${remainingSeconds}s`
+      : `${minutes}m`;
   };
 
   return (
@@ -77,32 +79,52 @@ const WorkoutCompleteModal: React.FC<WorkoutCompleteModalProps> = ({
 
             {/* Title */}
             <Text style={styles.title}>Workout Complete!</Text>
-            <Text style={styles.subtitle}>Great job! You've finished your workout.</Text>
+            <Text style={styles.subtitle}>
+              Great job! You've finished your workout.
+            </Text>
 
             {/* Stats */}
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
                 <Ionicons name="time" size={20} color="rgba(255,255,255,0.8)" />
                 <Text style={styles.statLabel}>Total Time</Text>
-                <Text style={styles.statValue}>{formatTime(workoutData.totalTime)}</Text>
+                <Text style={styles.statValue}>
+                  {formatTime(workoutData.totalTime)}
+                </Text>
               </View>
 
               <View style={styles.statItem}>
-                <Ionicons name="repeat" size={20} color="rgba(255,255,255,0.8)" />
+                <Ionicons
+                  name="repeat"
+                  size={20}
+                  color="rgba(255,255,255,0.8)"
+                />
                 <Text style={styles.statLabel}>Sets</Text>
                 <Text style={styles.statValue}>{workoutData.sets}</Text>
               </View>
 
               <View style={styles.statItem}>
-                <Ionicons name="flash" size={20} color="rgba(255,255,255,0.8)" />
+                <Ionicons
+                  name="flash"
+                  size={20}
+                  color="rgba(255,255,255,0.8)"
+                />
                 <Text style={styles.statLabel}>Work</Text>
-                <Text style={styles.statValue}>{formatTimeText(workoutData.workTime)}</Text>
+                <Text style={styles.statValue}>
+                  {formatTimeText(workoutData.workTime)}
+                </Text>
               </View>
 
               <View style={styles.statItem}>
-                <Ionicons name="pause" size={20} color="rgba(255,255,255,0.8)" />
+                <Ionicons
+                  name="pause"
+                  size={20}
+                  color="rgba(255,255,255,0.8)"
+                />
                 <Text style={styles.statLabel}>Rest</Text>
-                <Text style={styles.statValue}>{formatTimeText(workoutData.restTime)}</Text>
+                <Text style={styles.statValue}>
+                  {formatTimeText(workoutData.restTime)}
+                </Text>
               </View>
             </View>
 
@@ -126,11 +148,12 @@ const WorkoutCompleteModal: React.FC<WorkoutCompleteModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
+
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    height: height * 0.7,
+    height: height * 0.8,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     overflow: 'hidden',

@@ -40,11 +40,23 @@ const FitIntervalTimer: React.FC = () => {
   const params = useLocalSearchParams();
   const { audio, timer } = useSettingsStore();
 
-  const workTime = parseInt((params.workTime as string) || (timer.workTime.minutes * 60 + timer.workTime.seconds).toString(), 10);
-  const restTime = parseInt((params.restTime as string) || (timer.restTime.minutes * 60 + timer.restTime.seconds).toString(), 10);
-  const totalSets = parseInt((params.sets as string) || timer.sets.toString(), 10);
+  const workTime = parseInt(
+    (params.workTime as string) ||
+      (timer.workTime.minutes * 60 + timer.workTime.seconds).toString(),
+    10,
+  );
+  const restTime = parseInt(
+    (params.restTime as string) ||
+      (timer.restTime.minutes * 60 + timer.restTime.seconds).toString(),
+    10,
+  );
+  const totalSets = parseInt(
+    (params.sets as string) || timer.sets.toString(),
+    10,
+  );
   const soundEnabled = params.soundEnabled === 'true' || audio.soundEnabled;
-  const vibrationEnabled = params.vibrationEnabled === 'true' || audio.vibrationEnabled;
+  const vibrationEnabled =
+    params.vibrationEnabled === 'true' || audio.vibrationEnabled;
   const keepScreenOn = params.keepScreenOn === 'true' || timer.keepScreenOn;
 
   const [state, setState] = useState<TimerState>({
@@ -125,7 +137,12 @@ const FitIntervalTimer: React.FC = () => {
             if (prev.currentPhase === 'rest') {
               audioService.playWorkSound(audio.volume, prev.soundEnabled);
               if (audio.voiceEnabled && prev.soundEnabled) {
-                audioService.playVoiceGuidance('Work time', audio.volume, audio.voiceEnabled, prev.soundEnabled);
+                audioService.playVoiceGuidance(
+                  'Work time',
+                  audio.volume,
+                  audio.voiceEnabled,
+                  prev.soundEnabled,
+                );
               }
             }
 
@@ -150,11 +167,14 @@ const FitIntervalTimer: React.FC = () => {
               }
             } else {
               // Workout complete - only vibration
-              audioService.triggerHapticFeedback(prev.vibrationEnabled, 'heavy');
-              
+              audioService.triggerHapticFeedback(
+                prev.vibrationEnabled,
+                'heavy',
+              );
+
               // Show completion modal
               setShowCompleteModal(true);
-              
+
               return {
                 ...prev,
                 isRunning: false,
@@ -248,11 +268,11 @@ const FitIntervalTimer: React.FC = () => {
     try {
       const endTime = Date.now();
       const totalDuration = Math.floor((endTime - startTime) / 1000);
-      
+
       const workoutTitle = workoutStorage.formatWorkoutTitle(
         state.workTime,
         state.restTime,
-        state.totalSets
+        state.totalSets,
       );
 
       await workoutStorage.saveWorkout({
@@ -265,7 +285,7 @@ const FitIntervalTimer: React.FC = () => {
       });
 
       setShowCompleteModal(false);
-      router.back();
+      router.push('/records');
     } catch (error) {
       console.error('Error saving workout:', error);
       setShowCompleteModal(false);
