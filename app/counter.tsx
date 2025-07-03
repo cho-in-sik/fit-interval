@@ -58,6 +58,7 @@ const FitIntervalTimer: React.FC = () => {
   const vibrationEnabled =
     params.vibrationEnabled === 'true' || audio.vibrationEnabled;
   const keepScreenOn = params.keepScreenOn === 'true' || timer.keepScreenOn;
+  const workoutTitle = (params.workoutTitle as string) || 'Work';
 
   const [state, setState] = useState<TimerState>({
     isRunning: true,
@@ -269,12 +270,6 @@ const FitIntervalTimer: React.FC = () => {
       const endTime = Date.now();
       const totalDuration = Math.floor((endTime - startTime) / 1000);
 
-      const workoutTitle = workoutStorage.formatWorkoutTitle(
-        state.workTime,
-        state.restTime,
-        state.totalSets,
-      );
-
       await workoutStorage.saveWorkout({
         title: workoutTitle,
         date: workoutStorage.formatDate(endTime),
@@ -348,7 +343,7 @@ const FitIntervalTimer: React.FC = () => {
           {/* Phase Label */}
           <View style={styles.phaseContainer}>
             <Text style={styles.phaseText}>
-              {state.currentPhase.toUpperCase()}
+              {state.currentPhase === 'work' ? workoutTitle.toUpperCase() : 'REST'}
             </Text>
             <View style={styles.phaseUnderline} />
           </View>

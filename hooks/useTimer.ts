@@ -8,7 +8,7 @@ export const useTimer = () => {
   const router = useRouter();
   const { audio, timer } = useSettingsStore();
 
-  const startTimer = async () => {
+  const startTimer = async (workoutTitle = 'Work') => {
     let canProceed = true;
 
     if (audio.soundEnabled) {
@@ -44,6 +44,7 @@ export const useTimer = () => {
         soundEnabled: audio.soundEnabled.toString(),
         vibrationEnabled: audio.vibrationEnabled.toString(),
         keepScreenOn: timer.keepScreenOn.toString(),
+        workoutTitle,
       },
     });
   };

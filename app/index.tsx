@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, SafeAreaView, StatusBar } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  SafeAreaView,
+  StatusBar,
+  TextInput,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Drawer from '@/components/Drawer';
 import { TimerHeader } from '@/components/timer/TimerHeader';
@@ -36,6 +43,7 @@ const FitIntervalApp: React.FC = () => {
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [workoutTitle, setWorkoutTitle] = useState('Work');
 
   const handleWorkTimePress = () => {
     openTimePicker('work', settings.workTime);
@@ -78,62 +86,69 @@ const FitIntervalApp: React.FC = () => {
       <SafeAreaView className="flex-1 bg-white">
         <StatusBar barStyle="dark-content" backgroundColor="#F3F4F6" />
 
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <TimerHeader onMenuPress={() => setDrawerVisible(true)} />
+        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+          <TimerHeader onMenuPress={() => setDrawerVisible(true)} />
 
-        {/* Main Content */}
-        <View className="px-4 py-6">
-          {/* Intro Section */}
-          <View className="mb-8">
-            <Text className="text-2xl font-bold text-gray-800 mb-2">
-              Set Your Interval Timer
-            </Text>
-            <Text className="text-gray-700">
-              Configure your workout intervals and tap start when ready.
-            </Text>
+          {/* Main Content */}
+          <View className="px-4 py-6">
+            {/* Workout Title Section */}
+            <View className="mb-8">
+              <Text className="text-2xl font-bold text-gray-800 mb-2">
+                어떤 운동인가요?
+              </Text>
+              <Text className="text-gray-700 mb-3">
+                이번 운동의 제목을 정해주세요.
+              </Text>
+              <TextInput
+                value={workoutTitle}
+                onChangeText={setWorkoutTitle}
+                placeholder="운동 제목을 입력하세요"
+                className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-base text-gray-800"
+                placeholderTextColor="#9CA3AF"
+              />
+            </View>
+
+            <TimerSettings
+              workTime={settings.workTime}
+              restTime={settings.restTime}
+              sets={settings.sets}
+              onWorkTimePress={handleWorkTimePress}
+              onRestTimePress={handleRestTimePress}
+              onSetsAdjust={handleSetsAdjust}
+            />
+
+            <TimerOptions
+              showOptions={showOptions}
+              soundEnabled={settings.soundEnabled}
+              vibrationEnabled={settings.vibrationEnabled}
+              keepScreenOn={settings.keepScreenOn}
+              onToggleOptions={() => setShowOptions(!showOptions)}
+              onSoundToggle={updateSoundEnabled}
+              onVibrationToggle={updateVibrationEnabled}
+              onKeepScreenOnToggle={updateKeepScreenOn}
+            />
+
+            <WorkoutSummary timeData={timeData} />
           </View>
+        </ScrollView>
 
-          <TimerSettings
-            workTime={settings.workTime}
-            restTime={settings.restTime}
-            sets={settings.sets}
-            onWorkTimePress={handleWorkTimePress}
-            onRestTimePress={handleRestTimePress}
-            onSetsAdjust={handleSetsAdjust}
-          />
+        <BottomButton title="Start Timer" onPress={() => startTimer(workoutTitle)} />
 
-          <TimerOptions
-            showOptions={showOptions}
-            soundEnabled={settings.soundEnabled}
-            vibrationEnabled={settings.vibrationEnabled}
-            keepScreenOn={settings.keepScreenOn}
-            onToggleOptions={() => setShowOptions(!showOptions)}
-            onSoundToggle={updateSoundEnabled}
-            onVibrationToggle={updateVibrationEnabled}
-            onKeepScreenOnToggle={updateKeepScreenOn}
-          />
+        <TimePickerModal
+          visible={timePickerModal.visible}
+          type={timePickerModal.type}
+          minutes={timePickerModal.minutes}
+          seconds={timePickerModal.seconds}
+          onClose={closeTimePicker}
+          onConfirm={handleTimePickerConfirm}
+          onAdjustTime={adjustTime}
+          onDragTime={dragTime}
+        />
 
-          <WorkoutSummary timeData={timeData} />
-        </View>
-      </ScrollView>
-
-      <BottomButton title="Start Timer" onPress={startTimer} />
-
-      <TimePickerModal
-        visible={timePickerModal.visible}
-        type={timePickerModal.type}
-        minutes={timePickerModal.minutes}
-        seconds={timePickerModal.seconds}
-        onClose={closeTimePicker}
-        onConfirm={handleTimePickerConfirm}
-        onAdjustTime={adjustTime}
-        onDragTime={dragTime}
-      />
-
-      <Drawer
-        drawerVisible={drawerVisible}
-        setDrawerVisible={setDrawerVisible}
-      />
+        <Drawer
+          drawerVisible={drawerVisible}
+          setDrawerVisible={setDrawerVisible}
+        />
       </SafeAreaView>
     </GestureHandlerRootView>
   );
