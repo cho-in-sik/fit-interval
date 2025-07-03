@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(npx expo install:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npx react-native run-ios:*)",
+      "Bash(npm start)",
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(npx expo start:*)"
     ],
     "deny": []
   }
