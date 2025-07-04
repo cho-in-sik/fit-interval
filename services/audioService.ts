@@ -46,8 +46,9 @@ class AudioService {
   async playWorkSound(volume: number = 1.0, soundEnabled: boolean = true) {
     if (!soundEnabled || !this.workSound) return;
 
-    const hasPermission = await permissionService.requestAudioPermission();
-    if (!hasPermission) return;
+    // 저장된 권한 상태만 확인
+    const permissions = permissionService.getPermissionStatus();
+    if (!permissions.audio) return;
 
     try {
       await this.workSound.stopAsync();
@@ -62,8 +63,9 @@ class AudioService {
   async playRestSound(volume: number = 1.0, soundEnabled: boolean = true) {
     if (!soundEnabled || !this.restSound) return;
 
-    const hasPermission = await permissionService.requestAudioPermission();
-    if (!hasPermission) return;
+    // 저장된 권한 상태만 확인
+    const permissions = permissionService.getPermissionStatus();
+    if (!permissions.audio) return;
 
     try {
       await this.restSound.stopAsync();
@@ -78,8 +80,9 @@ class AudioService {
   async playEndSound(volume: number = 1.0, soundEnabled: boolean = true) {
     if (!soundEnabled || !this.endSound) return;
 
-    const hasPermission = await permissionService.requestAudioPermission();
-    if (!hasPermission) return;
+    // 저장된 권한 상태만 확인
+    const permissions = permissionService.getPermissionStatus();
+    if (!permissions.audio) return;
 
     try {
       await this.endSound.stopAsync();
@@ -99,12 +102,9 @@ class AudioService {
   ) {
     if (!soundEnabled || !voiceEnabled) return;
 
-    // 음성 안내를 위한 권한 요청
-    const hasSpeechPermission = await permissionService.requestSpeechPermission();
-    if (!hasSpeechPermission) return;
-
-    const hasAudioPermission = await permissionService.requestAudioPermission();
-    if (!hasAudioPermission) return;
+    // 저장된 권한 상태만 확인 (권한 요청하지 않음)
+    const permissions = permissionService.getPermissionStatus();
+    if (!permissions.speech || !permissions.audio) return;
 
     try {
       // 볼륨에 따라 다른 속성으로 구분하여 재생
@@ -131,12 +131,9 @@ class AudioService {
   ) {
     if (!soundEnabled || !voiceEnabled) return;
 
-    // 음성 안내를 위한 권한 요청
-    const hasSpeechPermission = await permissionService.requestSpeechPermission();
-    if (!hasSpeechPermission) return;
-
-    const hasAudioPermission = await permissionService.requestAudioPermission();
-    if (!hasAudioPermission) return;
+    // 저장된 권한 상태만 확인 (권한 요청하지 않음)
+    const permissions = permissionService.getPermissionStatus();
+    if (!permissions.speech || !permissions.audio) return;
 
     try {
       const countText = count.toString();
@@ -202,8 +199,9 @@ class AudioService {
   ) {
     if (!vibrationEnabled) return;
 
-    const hasPermission = await permissionService.requestHapticsPermission();
-    if (!hasPermission) return;
+    // 저장된 권한 상태만 확인
+    const permissions = permissionService.getPermissionStatus();
+    if (!permissions.haptics) return;
 
     try {
       switch (intensity) {

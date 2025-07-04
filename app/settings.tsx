@@ -66,11 +66,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
       await audioService.stopAllAudio();
     }
     
+    // 권한이 없으면 토글 비활성화
     if (value) {
-      const hasPermission = await permissionService.requestAudioPermission();
-      if (!hasPermission) {
-        setSoundEnabledLocal(false);
-        setSoundEnabled(false);
+      const permissions = permissionService.getPermissionStatus();
+      if (!permissions.audio) {
+        alert('오디오 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.');
         return;
       }
     }
@@ -103,10 +103,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
 
   const handleVibrationToggle = async (value: boolean) => {
     if (value) {
-      const hasPermission = await permissionService.requestHapticsPermission();
-      if (!hasPermission) {
-        setVibrationEnabledLocal(false);
-        setVibrationEnabled(false);
+      const permissions = permissionService.getPermissionStatus();
+      if (!permissions.haptics) {
+        alert('진동 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.');
         return;
       }
       await audioService.triggerHapticFeedback(true, 'medium');

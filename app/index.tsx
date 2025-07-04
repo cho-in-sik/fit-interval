@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import { useTimerSettings } from '@/hooks/useTimerSettings';
 import { useTimePicker } from '@/hooks/useTimePicker';
 import { useTimer } from '@/hooks/useTimer';
 import { calculateTotalTime } from '@/utils/timerCalculator';
+import { permissionService } from '@/services/permissionService';
 
 const FitIntervalApp: React.FC = () => {
   const {
@@ -44,6 +45,14 @@ const FitIntervalApp: React.FC = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [workoutTitle, setWorkoutTitle] = useState('Work');
+
+  // 앱 최초 실행 시 권한 요청
+  useEffect(() => {
+    const requestPermissions = async () => {
+      await permissionService.requestAllPermissionsOnFirstLaunch();
+    };
+    requestPermissions();
+  }, []);
 
   const handleWorkTimePress = () => {
     openTimePicker('work', settings.workTime);

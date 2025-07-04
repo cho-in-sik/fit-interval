@@ -143,13 +143,64 @@ class PermissionService {
     return { ...this.permissionStatus };
   }
 
+  async requestAllPermissionsOnFirstLaunch(): Promise<PermissionStatus> {
+    await this.loadPermissions();
+    
+    // 이미 권한을 요청했다면 다시 요청하지 않음
+    const stored = await AsyncStorage.getItem(this.STORAGE_KEY);
+    if (stored) {
+      return this.getPermissionStatus();
+    }
+
+    // 앱 최초 실행 시 모든 권한 한 번에 요청
+    return new Promise((resolve) => {
+      Alert.alert(
+        '권한 요청',
+        'FitInterval이 원활히 작동하려면 다음 권한들이 필요합니다:\n\n• 오디오: 음성 안내 및 알림음\n• 진동: 타이머 알림\n• 음성 합성: 운동 안내',
+        [
+          {
+            text: '취소',
+            onPress: async () => {
+              this.permissionStatus = {
+                audio: false,
+                haptics: false,
+                speech: false,
+              };
+              await this.savePermissions();
+              resolve(this.getPermissionStatus());
+            },
+            style: 'cancel',
+          },
+          {
+            text: '권한 허용',
+            onPress: async () => {
+              // 오디오 권한 요청
+              try {
+                const { status } = await Audio.requestPermissionsAsync();
+                this.permissionStatus.audio = status === 'granted';
+              } catch (error) {
+                this.permissionStatus.audio = false;
+              }
+
+              // 진동과 음성은 시스템 권한이므로 true로 설정
+              this.permissionStatus.haptics = true;
+              this.permissionStatus.speech = true;
+
+              await this.savePermissions();
+              resolve(this.getPermissionStatus());
+            },
+          },
+        ]
+      );
+    });
+  }
+
   async initializePermissions(): Promise<PermissionStatus> {
     await this.loadPermissions();
     await Promise.all([
       this.checkAudioPermission(),
       this.checkHapticsPermission(),
     ]);
-    await this.savePermissions();
     return this.getPermissionStatus();
   }
 }
