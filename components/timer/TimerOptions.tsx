@@ -75,7 +75,7 @@ export const TimerOptions: React.FC<TimerOptionsProps> = ({
           </View>
 
           {/* Keep Screen On Toggle */}
-          <View className="flex-row items-center justify-between">
+          {/* <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <Ionicons name="phone-portrait" size={20} color="#374151" />
               <Text className="ml-3 text-gray-800">Keep Screen On</Text>
@@ -86,7 +86,7 @@ export const TimerOptions: React.FC<TimerOptionsProps> = ({
               trackColor={{ false: '#D1D5DB', true: '#3B82F6' }}
               thumbColor="#FFFFFF"
             />
-          </View>
+          </View> */}
         </View>
       )}
     </View>

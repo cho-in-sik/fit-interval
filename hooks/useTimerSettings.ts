@@ -11,7 +11,13 @@ export interface TimerSettings {
 }
 
 export const useTimerSettings = () => {
-  const { audio, timer, setTimerSettings } = useSettingsStore();
+  const { 
+    audio, 
+    timer, 
+    setTimerSettings, 
+    setSoundEnabled, 
+    setVibrationEnabled 
+  } = useSettingsStore();
 
   const [settings, setSettings] = useState<TimerSettings>({
     workTime: timer.workTime,
@@ -50,14 +56,17 @@ export const useTimerSettings = () => {
 
   const updateSoundEnabled = (enabled: boolean) => {
     setSettings((prev) => ({ ...prev, soundEnabled: enabled }));
+    setSoundEnabled(enabled);
   };
 
   const updateVibrationEnabled = (enabled: boolean) => {
     setSettings((prev) => ({ ...prev, vibrationEnabled: enabled }));
+    setVibrationEnabled(enabled);
   };
 
   const updateKeepScreenOn = (enabled: boolean) => {
     setSettings((prev) => ({ ...prev, keepScreenOn: enabled }));
+    setTimerSettings({ keepScreenOn: enabled });
   };
 
   return {

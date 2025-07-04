@@ -7,6 +7,7 @@ import {
   Switch,
   SafeAreaView,
   Image,
+  AppState,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -40,7 +41,31 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
     setVibrationEnabledLocal(audio.vibrationEnabled);
   }, [audio]);
 
+  // 컴포넌트 언마운트 시 모든 오디오 중단
+  useEffect(() => {
+    return () => {
+      audioService.stopAllAudio();
+    };
+  }, []);
+
+  // 앱 상태 변경 감지하여 오디오 중단
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: string) => {
+      if (nextAppState === 'background' || nextAppState === 'inactive') {
+        audioService.stopAllAudio();
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription?.remove();
+  }, []);
+
   const handleSoundToggle = async (value: boolean) => {
+    // 사운드를 끌 때 진행 중인 모든 오디오 중단
+    if (!value) {
+      await audioService.stopAllAudio();
+    }
+    
     if (value) {
       const hasPermission = await permissionService.requestAudioPermission();
       if (!hasPermission) {
@@ -67,7 +92,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
   const handleVolumeTest = async () => {
     if (soundEnabled) {
       await audioService.initialize();
-      await audioService.playWorkSound(volume, true);
+      await audioService.playWorkSound(volume, soundEnabled);
+      
+      // 3초 후 자동으로 중단
+      setTimeout(() => {
+        audioService.stopAllAudio();
+      }, 3000);
     }
   };
 
@@ -140,7 +170,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                         Sound
                       </Text>
                       <Text className="text-sm text-neutral-600">
-                        Enable all audio sounds
+                        샘플 오디오 및 음성 안내 활성화
                       </Text>
                     </View>
                   </View>
@@ -163,16 +193,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                       <Icon
                         name="microphone"
                         size={16}
-                        color="#007AFF"
+                        color={!soundEnabled ? "#9CA3AF" : "#007AFF"}
                         solid
                       />
                     </View>
                     <View className="flex-1">
-                      <Text className="text-base font-medium text-neutral-800">
+                      <Text className={`text-base font-medium ${!soundEnabled ? 'text-neutral-500' : 'text-neutral-800'}`}>
                         Voice Guidance
                       </Text>
-                      <Text className="text-sm text-neutral-600">
-                        Audio cues for intervals
+                      <Text className={`text-sm ${!soundEnabled ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                        운동/휴식 전환 시 음성 안내
                       </Text>
                     </View>
                   </View>
@@ -194,23 +224,23 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
               >
                 <View className="flex-row items-center mb-4">
                   <View className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4">
-                    <Icon name="volume-low" size={16} color="#007AFF" solid />
+                    <Icon name="volume-low" size={16} color={!soundEnabled ? "#9CA3AF" : "#007AFF"} solid />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-base font-medium text-neutral-800">
-                      Voice Volume
+                    <Text className={`text-base font-medium ${!soundEnabled ? 'text-neutral-500' : 'text-neutral-800'}`}>
+                      Volume
                     </Text>
-                    <Text className="text-sm text-neutral-600">
-                      Adjust audio level
+                    <Text className={`text-sm ${!soundEnabled ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                      샘플 오디오 볼륨 (음성은 시스템 볼륨 사용)
                     </Text>
                   </View>
-                  <Text className="text-lg font-semibold text-blue-600">
+                  <Text className={`text-lg font-semibold ${!soundEnabled ? 'text-neutral-400' : 'text-blue-600'}`}>
                     {volume}%
                   </Text>
                 </View>
 
                 <View className="flex-row items-center space-x-3">
-                  <Icon name="volume-off" size={14} color="#9CA3AF" solid />
+                  <Icon name="volume-off" size={14} color={!soundEnabled ? "#D1D5DB" : "#9CA3AF"} solid />
                   <View className="flex-1 mx-3">
                     <Slider
                       style={{ width: '100%', height: 40 }}
@@ -219,13 +249,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                       value={volume}
                       onValueChange={handleVolumeChange}
                       onSlidingComplete={handleVolumeTest}
-                      minimumTrackTintColor="#007AFF"
+                      minimumTrackTintColor={!soundEnabled ? "#D1D5DB" : "#007AFF"}
                       maximumTrackTintColor="#E5E7EB"
-                      thumbTintColor="#007AFF"
+                      thumbTintColor={!soundEnabled ? "#D1D5DB" : "#007AFF"}
                       disabled={!soundEnabled}
                     />
                   </View>
-                  <Icon name="volume-high" size={14} color="#9CA3AF" solid />
+                  <Icon name="volume-high" size={14} color={!soundEnabled ? "#D1D5DB" : "#9CA3AF"} solid />
                 </View>
               </View>
             </View>

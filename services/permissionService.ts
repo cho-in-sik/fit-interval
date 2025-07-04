@@ -1,16 +1,41 @@
 import { Audio } from 'expo-av';
 import { Alert, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface PermissionStatus {
   audio: boolean;
   haptics: boolean;
+  speech: boolean;
 }
 
 class PermissionService {
   private permissionStatus: PermissionStatus = {
     audio: false,
     haptics: false,
+    speech: false,
   };
+  
+  private readonly STORAGE_KEY = 'permissions-status';
+
+  async loadPermissions(): Promise<void> {
+    try {
+      const stored = await AsyncStorage.getItem(this.STORAGE_KEY);
+      if (stored) {
+        const permissions = JSON.parse(stored);
+        this.permissionStatus = { ...this.permissionStatus, ...permissions };
+      }
+    } catch (error) {
+      console.error('Failed to load permissions:', error);
+    }
+  }
+
+  async savePermissions(): Promise<void> {
+    try {
+      await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.permissionStatus));
+    } catch (error) {
+      console.error('Failed to save permissions:', error);
+    }
+  }
 
   async checkAudioPermission(): Promise<boolean> {
     try {
@@ -43,11 +68,13 @@ class PermissionService {
       
       if (currentStatus === 'granted') {
         this.permissionStatus.audio = true;
+        await this.savePermissions();
         return true;
       }
       
       const { status } = await Audio.requestPermissionsAsync();
       this.permissionStatus.audio = status === 'granted';
+      await this.savePermissions();
       return this.permissionStatus.audio;
     } catch (error) {
       console.error('Failed to request audio permission:', error);
@@ -74,7 +101,37 @@ class PermissionService {
             text: '허용',
             onPress: async () => {
               const granted = await this.checkHapticsPermission();
+              this.permissionStatus.haptics = granted;
+              await this.savePermissions();
               resolve(granted);
+            },
+          },
+        ]
+      );
+    });
+  }
+
+  async requestSpeechPermission(): Promise<boolean> {
+    if (this.permissionStatus.speech) {
+      return true;
+    }
+
+    return new Promise((resolve) => {
+      Alert.alert(
+        '음성 안내 권한 필요',
+        '음성 안내 기능을 사용하려면 시스템 접근 권한이 필요합니다.',
+        [
+          {
+            text: '취소',
+            onPress: () => resolve(false),
+            style: 'cancel',
+          },
+          {
+            text: '허용',
+            onPress: async () => {
+              this.permissionStatus.speech = true;
+              await this.savePermissions();
+              resolve(true);
             },
           },
         ]
@@ -87,10 +144,12 @@ class PermissionService {
   }
 
   async initializePermissions(): Promise<PermissionStatus> {
+    await this.loadPermissions();
     await Promise.all([
       this.checkAudioPermission(),
       this.checkHapticsPermission(),
     ]);
+    await this.savePermissions();
     return this.getPermissionStatus();
   }
 }

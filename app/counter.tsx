@@ -8,6 +8,7 @@ import {
   Animated,
   Dimensions,
   StyleSheet,
+  Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle } from 'react-native-svg';
@@ -92,6 +93,7 @@ const FitIntervalTimer: React.FC = () => {
     initAudio();
 
     return () => {
+      audioService.stopAllAudio(); // 모든 오디오 중단
       audioService.cleanup();
     };
   }, []);
@@ -129,57 +131,63 @@ const FitIntervalTimer: React.FC = () => {
           const newTimeRemaining = prev.timeRemaining - 1;
 
           if (newTimeRemaining === 0) {
-            // Audio and haptic feedback on phase completion
-            if (prev.vibrationEnabled) {
+            // Audio and haptic feedback on phase completion (현재 설정 상태 사용)
+            if (audio.vibrationEnabled) {
               audioService.triggerHapticFeedback(true, 'medium');
             }
 
-            // Only play sound for work phase
+            // 페이즈 전환 시 한국어 음성 안내 (현재 설정 상태 사용)
             if (prev.currentPhase === 'rest') {
-              audioService.playWorkSound(audio.volume, prev.soundEnabled);
-              if (audio.voiceEnabled && prev.soundEnabled) {
+              // 휴식 -> 운동 전환
+              if (audio.voiceEnabled && audio.soundEnabled) {
                 audioService.playVoiceGuidance(
-                  'Work time',
+                  `${workoutTitle} 시작`,
                   audio.volume,
                   audio.voiceEnabled,
-                  prev.soundEnabled,
+                  audio.soundEnabled,
+                );
+              }
+            } else if (prev.currentPhase === 'work') {
+              // 운동 -> 휴식 전환
+              if (audio.voiceEnabled && audio.soundEnabled) {
+                audioService.playVoiceGuidance(
+                  '휴식 시간',
+                  audio.volume,
+                  audio.voiceEnabled,
+                  audio.soundEnabled,
                 );
               }
             }
 
-            if (
-              prev.currentSet < prev.totalSets ||
-              prev.currentPhase === 'work'
-            ) {
-              // Switch phase
-              if (prev.currentPhase === 'work') {
+            if (prev.currentPhase === 'work') {
+              // 운동 완료 후
+              if (prev.currentSet < prev.totalSets) {
+                // 마지막 세트가 아니면 휴식 시간으로 전환
                 return {
                   ...prev,
                   currentPhase: 'rest',
                   timeRemaining: prev.restTime,
                 };
               } else {
+                // 마지막 세트 완료 - 운동 종료
+                audioService.triggerHapticFeedback(
+                  audio.vibrationEnabled,
+                  'heavy',
+                );
+                setShowCompleteModal(true);
                 return {
                   ...prev,
-                  currentPhase: 'work',
-                  timeRemaining: prev.workTime,
-                  currentSet: prev.currentSet + 1,
+                  isRunning: false,
+                  timeRemaining: 0,
                 };
               }
             } else {
-              // Workout complete - only vibration
-              audioService.triggerHapticFeedback(
-                prev.vibrationEnabled,
-                'heavy',
-              );
-
-              // Show completion modal
-              setShowCompleteModal(true);
-
+              // 휴식 완료 후 다음 세트 운동 시작
               return {
                 ...prev,
-                isRunning: false,
-                timeRemaining: 0,
+                currentPhase: 'work',
+                timeRemaining: prev.workTime,
+                currentSet: prev.currentSet + 1,
               };
             }
           }
@@ -207,14 +215,24 @@ const FitIntervalTimer: React.FC = () => {
   useEffect(() => {
     if (state.timeRemaining <= 3 && state.timeRemaining > 0) {
       startPulse();
-      // Only vibration for countdown
+      // Only vibration for countdown (현재 설정 상태 사용)
       if (audio.vibrationEnabled) {
         audioService.triggerHapticFeedback(true, 'light');
+      }
+      
+      // 휴식 시간 3초 카운트다운 음성 안내
+      if (state.currentPhase === 'rest' && audio.voiceEnabled && audio.soundEnabled) {
+        audioService.playCountdown(
+          state.timeRemaining,
+          audio.volume,
+          audio.voiceEnabled,
+          audio.soundEnabled
+        );
       }
     } else {
       stopPulse();
     }
-  }, [state.timeRemaining, audio.vibrationEnabled]);
+  }, [state.timeRemaining, audio.vibrationEnabled, audio.voiceEnabled, audio.soundEnabled, state.currentPhase]);
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -241,25 +259,77 @@ const FitIntervalTimer: React.FC = () => {
 
   const handlePausePlay = () => {
     setState((prev) => ({ ...prev, isPaused: !prev.isPaused }));
-    // Light haptic feedback for button press
+    // Light haptic feedback for button press (현재 설정 상태 사용)
     if (audio.vibrationEnabled) {
       audioService.triggerHapticFeedback(true, 'light');
     }
   };
 
   const handleReset = () => {
-    const resetTime =
-      state.currentPhase === 'work' ? state.workTime : state.restTime;
-    setState((prev) => ({ ...prev, timeRemaining: resetTime }));
-    // Light haptic feedback for button press
-    if (audio.vibrationEnabled) {
-      audioService.triggerHapticFeedback(true, 'light');
-    }
+    // 처음으로 돌아가기 확인창
+    Alert.alert(
+      '초기화',
+      '초기화할까요? 첫 세트 처음으로 돌아갑니다.',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '초기화',
+          onPress: () => {
+            setState({
+              ...state,
+              isRunning: true,
+              isPaused: false,
+              currentPhase: 'work',
+              timeRemaining: workTime,
+              currentSet: 1,
+            });
+            // Light haptic feedback for button press (현재 설정 상태 사용)
+            if (audio.vibrationEnabled) {
+              audioService.triggerHapticFeedback(true, 'light');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleSkip = () => {
-    setState((prev) => ({ ...prev, timeRemaining: 0 }));
-    // Light haptic feedback for button press
+    // 다음 세트로 넘어가기 (계속 플레이)
+    setState((prev) => {
+      if (prev.currentPhase === 'work') {
+        // 운동 중이면 휴식으로 전환 (마지막 세트가 아닌 경우만)
+        if (prev.currentSet < prev.totalSets) {
+          return {
+            ...prev,
+            currentPhase: 'rest',
+            timeRemaining: prev.restTime,
+            isRunning: true,
+            isPaused: false,
+          };
+        } else {
+          // 마지막 세트면 운동 완료
+          return {
+            ...prev,
+            timeRemaining: 0,
+          };
+        }
+      } else {
+        // 휴식 중이면 다음 세트 운동으로 전환
+        return {
+          ...prev,
+          currentPhase: 'work',
+          timeRemaining: prev.workTime,
+          currentSet: prev.currentSet + 1,
+          isRunning: true,
+          isPaused: false,
+        };
+      }
+    });
+    
+    // Light haptic feedback for button press (현재 설정 상태 사용)
     if (audio.vibrationEnabled) {
       audioService.triggerHapticFeedback(true, 'light');
     }

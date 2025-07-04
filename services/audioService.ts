@@ -1,5 +1,6 @@
-import { Audio, AVPlaybackSource } from 'expo-av';
+import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
+import * as Speech from 'expo-speech';
 import { permissionService } from './permissionService';
 
 class AudioService {
@@ -98,19 +99,100 @@ class AudioService {
   ) {
     if (!soundEnabled || !voiceEnabled) return;
 
-    const hasPermission = await permissionService.requestAudioPermission();
-    if (!hasPermission) return;
+    // 음성 안내를 위한 권한 요청
+    const hasSpeechPermission = await permissionService.requestSpeechPermission();
+    if (!hasSpeechPermission) return;
+
+    const hasAudioPermission = await permissionService.requestAudioPermission();
+    if (!hasAudioPermission) return;
 
     try {
-      if (text.toLowerCase().includes('work') || text.toLowerCase().includes('start')) {
-        await this.playWorkSound(volume, soundEnabled);
-      } else if (text.toLowerCase().includes('rest') || text.toLowerCase().includes('break')) {
-        await this.playRestSound(volume, soundEnabled);
-      } else if (text.toLowerCase().includes('end') || text.toLowerCase().includes('finish')) {
-        await this.playEndSound(volume, soundEnabled);
-      }
+      // 볼륨에 따라 다른 속성으로 구분하여 재생
+      const adjustedVolume = Math.max(0.1, Math.min(1.0, volume / 100));
+      const pitch = 1.0 + (volume - 50) * 0.004; // 볼륨에 따라 피치 미세 조정
+      const rate = 0.8 + (volume - 50) * 0.002; // 볼륨에 따라 속도 미세 조정
+      
+      Speech.speak(text, {
+        language: 'ko-KR',
+        pitch: Math.max(0.8, Math.min(1.2, pitch)),
+        rate: Math.max(0.7, Math.min(1.0, rate)),
+        volume: adjustedVolume,
+      });
     } catch (error) {
       console.error('Failed to play voice guidance:', error);
+    }
+  }
+
+  async playCountdown(
+    count: number,
+    volume: number = 1.0,
+    voiceEnabled: boolean = true,
+    soundEnabled: boolean = true
+  ) {
+    if (!soundEnabled || !voiceEnabled) return;
+
+    // 음성 안내를 위한 권한 요청
+    const hasSpeechPermission = await permissionService.requestSpeechPermission();
+    if (!hasSpeechPermission) return;
+
+    const hasAudioPermission = await permissionService.requestAudioPermission();
+    if (!hasAudioPermission) return;
+
+    try {
+      const countText = count.toString();
+      // 볼륨에 따라 다른 속성으로 구분하여 재생
+      const adjustedVolume = Math.max(0.1, Math.min(1.0, volume / 100));
+      const pitch = 1.2 + (volume - 50) * 0.004; // 볼륨에 따라 피치 미세 조정
+      const rate = 0.8 + (volume - 50) * 0.002; // 볼륨에 따라 속도 미세 조정
+      
+      Speech.speak(countText, {
+        language: 'ko-KR',
+        pitch: Math.max(1.0, Math.min(1.4, pitch)),
+        rate: Math.max(0.7, Math.min(1.0, rate)),
+        volume: adjustedVolume,
+      });
+    } catch (error) {
+      console.error('Failed to play countdown:', error);
+    }
+  }
+
+  async stopSpeech() {
+    try {
+      await Speech.stop();
+    } catch (error) {
+      console.error('Failed to stop speech:', error);
+    }
+  }
+
+  async stopAllAudio() {
+    try {
+      // TTS 중단
+      await Speech.stop();
+    } catch (error) {
+      console.error('Failed to stop TTS:', error);
+    }
+    
+    // 모든 사운드 강제 중단 (초기화 상태와 관계없이)
+    if (this.workSound) {
+      try {
+        await this.workSound.stopAsync();
+      } catch (soundError) {
+        // 개별 사운드 중단 실패는 무시
+      }
+    }
+    if (this.restSound) {
+      try {
+        await this.restSound.stopAsync();
+      } catch (soundError) {
+        // 개별 사운드 중단 실패는 무시
+      }
+    }
+    if (this.endSound) {
+      try {
+        await this.endSound.stopAsync();
+      } catch (soundError) {
+        // 개별 사운드 중단 실패는 무시
+      }
     }
   }
 
