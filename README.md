@@ -1,50 +1,126 @@
-# Welcome to your Expo app 👋
+# FitInterval - 운동 인터벌 타이머
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## 📋 주요 기능
 
-## Get started
+### 🏠 홈 화면
+- **운동 제목 설정**: 사용자가 직접 운동 이름을 입력하여 개인화 가능
+- **운동 시간 설정**: 분/초 단위로 정확한 운동 시간 설정
+- **휴식 시간 설정**: 분/초 단위로 정확한 휴식 시간 설정
+- **세트 수 설정**: 1~99세트까지 설정 가능
+- **추가 설정 토글**: 하단의 추가 설정 버튼으로 세부 옵션 표시/숨김
+- **사운드 토글**: 전체 오디오 기능 활성화/비활성화
+- **진동 토글**: 진동 피드백 활성화/비활성화  
+- **화면 켜짐 유지**: 타이머 실행 중 화면 자동 꺼짐 방지
+- **운동 요약**: 설정된 내용에 따른 총 운동 시간 자동 계산 및 표시
+- **설정 연동**: 홈에서 변경한 설정이 설정 페이지와 실시간 동기화
 
-1. Install dependencies
+### ⏱️ 타이머 화면
+- **시각적 진행 표시**: 원형 프로그레스 바로 진행률 직관적 표시
+- **페이즈 구분**: 운동/휴식 구분을 색상과 텍스트로 명확히 표시
+- **실시간 카운트다운**: 남은 시간을 크게 표시하여 가독성 최대화
+- **세트 진행 표시**: 현재 세트/전체 세트를 숫자와 점으로 표시
+- **마지막 3초 효과**: 남은 시간 3초부터 화면 펄스 효과 및 진동
+- **음성 안내**: 
+  - 운동 시작 시: "[운동명] 시작" 한국어 TTS
+  - 휴식 시작 시: "휴식 시간" 한국어 TTS
+  - 휴식 마지막 3초: "삼", "이", "일" 카운트다운
+- **마지막 세트 로직**: 마지막 세트 완료 시 휴식 시간 없이 바로 완료 처리
 
-   ```bash
-   npm install
-   ```
+#### 컨트롤 버튼
+- **일시정지/재생**: 타이머 정지 및 재개 (진동 피드백 포함)
+- **초기화**: 확인 팝업 후 첫 세트 처음으로 완전 리셋
+- **다음**: 현재 단계를 건너뛰고 다음 단계로 즉시 이동 (일시정지 없이 계속 진행)
 
-2. Start the app
+#### 실시간 설정 반영
+- **사운드 설정 변경**: 타이머 실행 중에도 설정 페이지에서 변경한 사운드/음성 설정이 즉시 반영
+- **진동 설정 변경**: 타이머 실행 중에도 진동 설정 변경이 즉시 반영
+- **볼륨 조절**: 설정에서 볼륨 변경 시 타이머의 음성 안내에도 즉시 적용
 
-   ```bash
-    npx expo start
-   ```
+### ⚙️ 설정 화면
 
-In the output, you'll find options to open the app in a
+#### 오디오 설정
+- **사운드 마스터 토글**: 
+  - 켜기: 모든 오디오 기능 활성화
+  - 끄기: 진행 중인 모든 오디오 즉시 중단, 관련 UI 비활성화 표시
+- **보이스 가이던스**: 
+  - 설명: "운동/휴식 전환 시 음성 안내"
+  - 사운드가 꺼져있으면 자동으로 비활성화
+  - 의존성: 사운드 활성화 필요
+- **볼륨 조절**:
+  - 설명: "샘플 오디오 볼륨 (음성은 시스템 볼륨 사용)"
+  - 슬라이더로 0~100% 조절
+  - 볼륨 테스트: 슬라이더 조절 완료 시 샘플 오디오 재생
+  - 3초 후 자동 중단
+  - 사운드가 꺼져있으면 슬라이더 비활성화
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+#### 진동 설정
+- **진동 토글**: 타이머 알림용 진동 활성화/비활성화
+- **진동 테스트**: 토글 활성화 시 즉시 진동 피드백으로 테스트
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+#### 페이지 이동 시 오디오 처리
+- **페이지 벗어날 때**: 진행 중인 모든 오디오 자동 중단
+- **앱 백그라운드**: 앱이 백그라운드로 갈 때 오디오 중단
+- **음소거 토글**: 사운드 끌 때 진행 중인 오디오 즉시 중단
 
-## Get a fresh project
+### 📊 기록 화면
+- **운동 기록 저장**: 완료된 운동의 상세 정보 자동 저장
+- **운동 히스토리**: 과거 운동 기록 조회 및 관리
 
-When you're ready, run:
+### 🔐 권한 관리
 
-```bash
-npm run reset-project
-```
+#### 앱 최초 실행
+- **통합 권한 요청**: 앱 첫 실행 시 모든 필요 권한을 한 번에 요청
+- **권한 설명**: 
+  - 오디오: 음성 안내 및 알림음
+  - 진동: 타이머 알림
+  - 음성 합성: 운동 안내
+- **권한 저장**: 사용자 선택을 AsyncStorage에 영구 저장
+- **재요청 방지**: 이미 권한을 처리했다면 다시 묻지 않음
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+#### 권한 기반 기능 제어
+- **타이머 실행 중**: 권한 팝업 절대 표시 안 함
+- **저장된 권한 확인**: 기능 실행 전 저장된 권한 상태만 확인
+- **권한 부족 시**: 해당 기능 자동 비활성화
+- **설정 변경 제한**: 권한 없는 기능 활성화 시도 시 안내 메시지
 
-## Learn more
+### 🔄 설정 동기화
 
-To learn more about developing your project with Expo, look at the following resources:
+#### 실시간 연동
+- **홈 ↔ 설정**: 어느 페이지에서 변경해도 다른 페이지에 즉시 반영
+- **설정 ↔ 타이머**: 타이머 실행 중에도 설정 변경사항 실시간 적용
+- **영구 저장**: 모든 설정 변경사항을 AsyncStorage에 자동 저장
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+#### 설정 항목별 동기화
+- **사운드 설정**: 홈/설정 어디서 변경해도 동일하게 반영
+- **진동 설정**: 홈/설정 어디서 변경해도 동일하게 반영
+- **화면 켜짐 유지**: 홈/설정 어디서 변경해도 동일하게 반영
+- **타이머 설정**: 운동시간, 휴식시간, 세트 수 모두 동기화
 
-## Join the community
+### 🎵 오디오 시스템
 
-Join our community of developers creating universal apps.
+#### 파일별 역할 구분
+- **설정 페이지**: 볼륨 테스트용 샘플 오디오만 사용
+- **타이머 페이지**: 한국어 TTS 음성 안내만 사용
+- **볼륨 조절**: 샘플 오디오는 앱 내 볼륨으로 조절, TTS는 시스템 볼륨으로 조절
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+#### 오디오 중단 시스템
+- **즉시 중단**: 페이지 이동, 음소거, 앱 백그라운드 시 모든 오디오 즉시 중단
+- **자동 중단**: 볼륨 테스트 3초 후 자동 중단
+- **에러 방지**: 오디오가 로드되지 않은 상태에서도 안전하게 중단 처리
+
+### 🎯 사용자 경험 최적화
+
+#### 직관적 인터페이스
+- **시각적 피드백**: 모든 상호작용에 적절한 시각적 반응
+- **상태 표시**: 현재 설정 상태를 명확하게 표시
+- **비활성화 표시**: 권한 없거나 의존성 미충족 시 시각적으로 구분
+
+#### 끊김 없는 경험
+- **권한 팝업 최소화**: 앱 최초에만 권한 요청, 이후 방해 없음
+- **실시간 반영**: 설정 변경사항이 즉시 적용되어 재시작 불필요
+- **연속성 보장**: 타이머 실행 중 어떤 설정을 변경해도 타이머 중단 없음
+
+#### 안전성
+- **데이터 보존**: 모든 설정과 권한 상태를 안전하게 저장
+- **에러 처리**: 오디오 재생 실패, 권한 거부 등 모든 예외 상황 안전 처리
+- **상태 복구**: 앱 재시작 시 이전 설정 상태 완전 복구

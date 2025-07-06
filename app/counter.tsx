@@ -141,7 +141,7 @@ const FitIntervalTimer: React.FC = () => {
               // 휴식 -> 운동 전환
               if (audio.voiceEnabled && audio.soundEnabled) {
                 audioService.playVoiceGuidance(
-                  `${workoutTitle} 시작`,
+                  `운동 시작`,
                   audio.volume,
                   audio.voiceEnabled,
                   audio.soundEnabled,
@@ -219,20 +219,30 @@ const FitIntervalTimer: React.FC = () => {
       if (audio.vibrationEnabled) {
         audioService.triggerHapticFeedback(true, 'light');
       }
-      
+
       // 휴식 시간 3초 카운트다운 음성 안내
-      if (state.currentPhase === 'rest' && audio.voiceEnabled && audio.soundEnabled) {
+      if (
+        state.currentPhase === 'rest' &&
+        audio.voiceEnabled &&
+        audio.soundEnabled
+      ) {
         audioService.playCountdown(
           state.timeRemaining,
           audio.volume,
           audio.voiceEnabled,
-          audio.soundEnabled
+          audio.soundEnabled,
         );
       }
     } else {
       stopPulse();
     }
-  }, [state.timeRemaining, audio.vibrationEnabled, audio.voiceEnabled, audio.soundEnabled, state.currentPhase]);
+  }, [
+    state.timeRemaining,
+    audio.vibrationEnabled,
+    audio.voiceEnabled,
+    audio.soundEnabled,
+    state.currentPhase,
+  ]);
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -267,33 +277,29 @@ const FitIntervalTimer: React.FC = () => {
 
   const handleReset = () => {
     // 처음으로 돌아가기 확인창
-    Alert.alert(
-      '초기화',
-      '초기화할까요? 첫 세트 처음으로 돌아갑니다.',
-      [
-        {
-          text: '취소',
-          style: 'cancel',
+    Alert.alert('초기화', '초기화할까요? 첫 세트 처음으로 돌아갑니다.', [
+      {
+        text: '취소',
+        style: 'cancel',
+      },
+      {
+        text: '초기화',
+        onPress: () => {
+          setState({
+            ...state,
+            isRunning: true,
+            isPaused: false,
+            currentPhase: 'work',
+            timeRemaining: workTime,
+            currentSet: 1,
+          });
+          // Light haptic feedback for button press (현재 설정 상태 사용)
+          if (audio.vibrationEnabled) {
+            audioService.triggerHapticFeedback(true, 'light');
+          }
         },
-        {
-          text: '초기화',
-          onPress: () => {
-            setState({
-              ...state,
-              isRunning: true,
-              isPaused: false,
-              currentPhase: 'work',
-              timeRemaining: workTime,
-              currentSet: 1,
-            });
-            // Light haptic feedback for button press (현재 설정 상태 사용)
-            if (audio.vibrationEnabled) {
-              audioService.triggerHapticFeedback(true, 'light');
-            }
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   const handleSkip = () => {
@@ -328,7 +334,7 @@ const FitIntervalTimer: React.FC = () => {
         };
       }
     });
-    
+
     // Light haptic feedback for button press (현재 설정 상태 사용)
     if (audio.vibrationEnabled) {
       audioService.triggerHapticFeedback(true, 'light');
@@ -399,13 +405,13 @@ const FitIntervalTimer: React.FC = () => {
             <Ionicons name="arrow-back" size={20} color="white" />
           </TouchableOpacity>
 
-          <View style={styles.headerCenter}>
+          {/* <View style={styles.headerCenter}>
             <Text style={styles.headerTitle}>FitInterval</Text>
-          </View>
+          </View> */}
 
-          <TouchableOpacity style={styles.headerButton}>
+          {/* <TouchableOpacity style={styles.headerButton}>
             <Ionicons name="ellipsis-horizontal" size={20} color="white" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         {/* Main Timer Area */}
@@ -413,7 +419,9 @@ const FitIntervalTimer: React.FC = () => {
           {/* Phase Label */}
           <View style={styles.phaseContainer}>
             <Text style={styles.phaseText}>
-              {state.currentPhase === 'work' ? workoutTitle.toUpperCase() : 'REST'}
+              {state.currentPhase === 'work'
+                ? workoutTitle.toUpperCase()
+                : 'REST'}
             </Text>
             <View style={styles.phaseUnderline} />
           </View>
