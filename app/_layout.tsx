@@ -44,7 +44,7 @@ export default function RootLayout() {
             <Stack.Screen name="records" options={{ headerShown: false }} />
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="settings" options={{ headerShown: false }} />
-            <Stack.Screen name="test" options={{ headerShown: false }} />
+
             <Stack.Screen name="+not-found" />
           </Stack>
           <StatusBar style="auto" />

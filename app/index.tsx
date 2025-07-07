@@ -24,7 +24,6 @@ import { useTimePicker } from '@/hooks/useTimePicker';
 import { useTimer } from '@/hooks/useTimer';
 import { permissionService } from '@/services/permissionService';
 
-
 interface Template {
   id: number;
   name: string;
@@ -37,12 +36,8 @@ interface Template {
 }
 
 const FitIntervalApp: React.FC = () => {
-  const {
-    settings,
-    updateWorkTime,
-    updateRestTime,
-    updateSets,
-  } = useTimerSettings();
+  const { settings, updateWorkTime, updateRestTime, updateSets } =
+    useTimerSettings();
 
   const {
     timePickerModal,
@@ -159,7 +154,6 @@ const FitIntervalApp: React.FC = () => {
     }
     closeTimePicker();
   };
-
 
   const templates: Template[] = [
     {
@@ -324,7 +318,7 @@ const FitIntervalApp: React.FC = () => {
 
             {/* Workout Title Section */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>운동 제목</Text>
+              <Text style={styles.sectionTitle}>Title</Text>
               <TextInput
                 value={workoutTitle}
                 onChangeText={setWorkoutTitle}
@@ -338,7 +332,9 @@ const FitIntervalApp: React.FC = () => {
             <View style={styles.section}>
               <View style={styles.timerHeader}>
                 <Text style={styles.timerTitle}>운동 설정</Text>
-                <Text style={styles.timerSubtitle}>탭하여 시간을 설정하세요</Text>
+                <Text style={styles.timerSubtitle}>
+                  탭하여 시간을 설정하세요
+                </Text>
               </View>
 
               {/* Central Interactive Timer */}
@@ -358,7 +354,7 @@ const FitIntervalApp: React.FC = () => {
                     />
                   </Animated.View>
 
-                  <BlurView intensity={20} style={styles.timerContent}>
+                  <View style={styles.timerContent}>
                     <View style={styles.timerInfo}>
                       <Text style={styles.timerTime}>
                         {String(settings.workTime.minutes).padStart(2, '0')}:
@@ -368,15 +364,17 @@ const FitIntervalApp: React.FC = () => {
                       <Text style={styles.timerTotal}>
                         {settings.sets} 세트 •{' '}
                         {Math.round(
-                          ((settings.workTime.minutes * 60 + settings.workTime.seconds +
-                            settings.restTime.minutes * 60 + settings.restTime.seconds) *
+                          ((settings.workTime.minutes * 60 +
+                            settings.workTime.seconds +
+                            settings.restTime.minutes * 60 +
+                            settings.restTime.seconds) *
                             settings.sets) /
-                            60
+                            60,
                         )}{' '}
                         분 예상
                       </Text>
                     </View>
-                  </BlurView>
+                  </View>
 
                   {/* Floating Action Buttons */}
                   <Animated.View
@@ -438,7 +436,7 @@ const FitIntervalApp: React.FC = () => {
 
             {/* Quick Workout Templates */}
             <View style={styles.section}>
-              <Text style={styles.templatesTitle}>빠른 시작 템플릿</Text>
+              <Text style={styles.templatesTitle}>Templates</Text>
               <View style={styles.templatesGrid}>
                 <View style={styles.templateRow}>
                   <View style={styles.templateColumn}>
@@ -460,7 +458,7 @@ const FitIntervalApp: React.FC = () => {
             </View>
 
             {/* Achievement & Motivation */}
-            <View style={[styles.section, styles.motivationSection]}>
+            {/* <View style={[styles.section, styles.motivationSection]}>
               <GlassMorphismView style={styles.motivationCard}>
                 <View style={styles.motivationHeader}>
                   <Text style={styles.motivationTitle}>오늘의 목표</Text>
@@ -485,6 +483,37 @@ const FitIntervalApp: React.FC = () => {
                   </View>
                 </View>
               </GlassMorphismView>
+            </View> */}
+            <View className="px-6 mb-8 rounded-2xl">
+              <BlurView intensity={20} tint="light" className="rounded-2xl p-5">
+                <View className="flex-row items-center justify-between mb-4">
+                  <Text className="font-semibold text-white">Today's Goal</Text>
+                  <Text className="text-2xl">🎯</Text>
+                </View>
+                <View className="flex-row items-center space-x-4">
+                  <View className="flex-1">
+                    <View className="flex-row justify-between mb-2">
+                      <Text className="text-sm text-white">Workouts</Text>
+                      <Text className="text-sm text-white">2/3</Text>
+                    </View>
+                    <View className="w-full bg-white bg-opacity-20 rounded-full h-3">
+                      <LinearGradient
+                        colors={['#10B981', '#EC4899']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        className="h-3 rounded-full"
+                        style={{ width: '67%' }}
+                      />
+                    </View>
+                  </View>
+                  <View className="items-end">
+                    <Text className="text-lg font-bold text-white">67%</Text>
+                    <Text className="text-xs text-white opacity-80">
+                      Complete
+                    </Text>
+                  </View>
+                </View>
+              </BlurView>
             </View>
           </ScrollView>
 
@@ -501,7 +530,7 @@ const FitIntervalApp: React.FC = () => {
                 <View style={styles.startButtonIcon}>
                   <Ionicons name="play" size={20} color="white" />
                 </View>
-                <Text style={styles.startButtonText}>운동 시작</Text>
+                <Text style={styles.startButtonText}>Start Workout</Text>
               </TouchableOpacity>
             </LinearGradient>
           </View>
@@ -668,7 +697,6 @@ const styles = StyleSheet.create({
     borderRadius: 124,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   timerInfo: {
     alignItems: 'center',
