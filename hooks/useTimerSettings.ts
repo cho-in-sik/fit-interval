@@ -29,15 +29,16 @@ export const useTimerSettings = () => {
   });
 
   useEffect(() => {
-    setSettings({
+    setSettings(prev => ({
+      ...prev,
       workTime: timer.workTime,
       restTime: timer.restTime,
       sets: timer.sets,
       soundEnabled: audio.soundEnabled,
       vibrationEnabled: audio.vibrationEnabled,
       keepScreenOn: timer.keepScreenOn,
-    });
-  }, [audio, timer]);
+    }));
+  }, [audio.soundEnabled, audio.vibrationEnabled, timer.workTime, timer.restTime, timer.sets, timer.keepScreenOn]);
 
   const updateWorkTime = (time: { minutes: number; seconds: number }) => {
     setSettings((prev) => ({ ...prev, workTime: time }));

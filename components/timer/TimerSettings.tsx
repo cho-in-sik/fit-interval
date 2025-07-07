@@ -39,8 +39,8 @@ export const TimerSettings: React.FC<TimerSettingsProps> = ({
               <Text className="ml-1 text-gray-700 text-sm">sec</Text>
             </View>
           </View>
-          <View className="w-12 h-12 rounded-full bg-blue-50 items-center justify-center">
-            <Ionicons name="chevron-forward" size={16} color="#3B82F6" />
+          <View className="w-12 h-12 rounded-full bg-emerald-50 items-center justify-center">
+            <Ionicons name="chevron-forward" size={16} color="#10B981" />
           </View>
         </View>
       </TouchableOpacity>
@@ -62,8 +62,8 @@ export const TimerSettings: React.FC<TimerSettingsProps> = ({
               <Text className="ml-1 text-gray-700 text-sm">sec</Text>
             </View>
           </View>
-          <View className="w-12 h-12 rounded-full bg-blue-50 items-center justify-center">
-            <Ionicons name="chevron-forward" size={16} color="#3B82F6" />
+          <View className="w-12 h-12 rounded-full bg-emerald-50 items-center justify-center">
+            <Ionicons name="chevron-forward" size={16} color="#10B981" />
           </View>
         </View>
       </TouchableOpacity>
@@ -85,15 +85,15 @@ export const TimerSettings: React.FC<TimerSettingsProps> = ({
           <View className="flex-row items-center">
             <TouchableOpacity
               onPress={() => onSetsAdjust('down')}
-              className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center mr-2"
+              className="w-10 h-10 rounded-full bg-emerald-50 items-center justify-center mr-2"
             >
-              <Ionicons name="remove" size={16} color="#374151" />
+              <Ionicons name="remove" size={16} color="#10B981" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => onSetsAdjust('up')}
-              className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
+              className="w-10 h-10 rounded-full bg-emerald-50 items-center justify-center"
             >
-              <Ionicons name="add" size={16} color="#374151" />
+              <Ionicons name="add" size={16} color="#10B981" />
             </TouchableOpacity>
           </View>
         </View>

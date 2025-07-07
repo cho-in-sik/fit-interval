@@ -208,34 +208,53 @@ const FitIntervalApp: React.FC = () => {
     </BlurView>
   );
 
-  const WorkoutCard: React.FC<{ template: Template }> = ({ template }) => (
-    <TouchableOpacity
-      onPress={() => setSelectedTemplate(template.id)}
-      style={[
-        styles.workoutCard,
-        selectedTemplate === template.id && styles.workoutCardSelected,
-      ]}
-    >
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{template.name}</Text>
-        <Text style={styles.cardIcon}>{template.icon}</Text>
-      </View>
-      <Text style={styles.cardSubtitle}>
-        {template.work}s work • {template.rest}s rest • {template.sets} sets
-      </Text>
-      <View style={styles.progressContainer}>
-        <View
-          style={[
-            styles.progressBar,
-            {
-              width: `${template.difficulty * 100}%`,
-              backgroundColor: template.color,
-            },
-          ]}
-        />
-      </View>
-    </TouchableOpacity>
-  );
+  const WorkoutCard: React.FC<{ template: Template }> = ({ template }) => {
+    const handleTemplatePress = () => {
+      setSelectedTemplate(template.id);
+
+      // 템플릿의 값들로 설정 업데이트
+      if (template.id !== 4) {
+        // Custom 템플릿이 아닌 경우에만 업데이트
+        const workMinutes = Math.floor(template.work / 60);
+        const workSeconds = template.work % 60;
+        const restMinutes = Math.floor(template.rest / 60);
+        const restSeconds = template.rest % 60;
+
+        updateWorkTime({ minutes: workMinutes, seconds: workSeconds });
+        updateRestTime({ minutes: restMinutes, seconds: restSeconds });
+        updateSets(template.sets);
+      }
+    };
+
+    return (
+      <TouchableOpacity
+        onPress={handleTemplatePress}
+        style={[
+          styles.workoutCard,
+          selectedTemplate === template.id && styles.workoutCardSelected,
+        ]}
+      >
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardTitle}>{template.name}</Text>
+          <Text style={styles.cardIcon}>{template.icon}</Text>
+        </View>
+        <Text style={styles.cardSubtitle}>
+          {template.work}s work • {template.rest}s rest • {template.sets} sets
+        </Text>
+        <View style={styles.progressContainer}>
+          <View
+            style={[
+              styles.progressBar,
+              {
+                width: `${template.difficulty * 100}%`,
+                backgroundColor: template.color,
+              },
+            ]}
+          />
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   const CustomTimeModal: React.FC = () => (
     <Modal
@@ -296,23 +315,23 @@ const FitIntervalApp: React.FC = () => {
                 <View style={styles.userInfo}>
                   <View style={styles.logoContainer}>
                     <Image
-                      source={require('../assets/images/fitinterval.png')}
+                      source={require('../assets/images/newFitInterval.png')}
                       style={styles.logo}
                     />
                   </View>
                   <View style={styles.userDetails}>
-                    <Text style={styles.appName}>핏인터벌</Text>
-                    <Text style={styles.greeting}>운동을 시작해보세요!</Text>
+                    <Text style={styles.appName}>FITINTERVAL</Text>
+                    {/* <Text style={styles.greeting}>운동을 시작해보세요!</Text> */}
                   </View>
                 </View>
-                <GlassMorphismView style={styles.profileButton}>
+                <View style={styles.profileButton}>
                   <TouchableOpacity
                     style={styles.profileButtonInner}
                     onPress={() => setDrawerVisible(true)}
                   >
-                    <Ionicons name="settings" size={20} color="white" />
+                    <Ionicons name="menu" size={20} color="#ffffff" />
                   </TouchableOpacity>
-                </GlassMorphismView>
+                </View>
               </View>
             </View>
 
@@ -331,7 +350,7 @@ const FitIntervalApp: React.FC = () => {
             {/* Interactive Timer Setup */}
             <View style={styles.section}>
               <View style={styles.timerHeader}>
-                <Text style={styles.timerTitle}>운동 설정</Text>
+                <Text style={styles.timerTitle}>Settings</Text>
                 <Text style={styles.timerSubtitle}>
                   탭하여 시간을 설정하세요
                 </Text>
@@ -391,7 +410,7 @@ const FitIntervalApp: React.FC = () => {
                       style={styles.floatingButtonInner}
                     >
                       <Ionicons name="fitness" size={20} color="#EC4899" />
-                      <Text style={styles.floatingButtonText}>운동</Text>
+                      <Text style={styles.floatingButtonText}>운동시간</Text>
                     </TouchableOpacity>
                   </Animated.View>
 
@@ -409,7 +428,7 @@ const FitIntervalApp: React.FC = () => {
                       style={styles.floatingButtonInner}
                     >
                       <Ionicons name="pause" size={20} color="#8B5CF6" />
-                      <Text style={styles.floatingButtonText}>휴식</Text>
+                      <Text style={styles.floatingButtonText}>휴식시간</Text>
                     </TouchableOpacity>
                   </Animated.View>
 
@@ -427,7 +446,7 @@ const FitIntervalApp: React.FC = () => {
                       style={styles.floatingButtonInner}
                     >
                       <Ionicons name="repeat" size={20} color="#10B981" />
-                      <Text style={styles.floatingButtonText}>설정</Text>
+                      <Text style={styles.floatingButtonText}>세트</Text>
                     </TouchableOpacity>
                   </Animated.View>
                 </View>
@@ -484,8 +503,8 @@ const FitIntervalApp: React.FC = () => {
                 </View>
               </GlassMorphismView>
             </View> */}
-            <View className="px-6 mb-8 rounded-2xl">
-              <BlurView intensity={20} tint="light" className="rounded-2xl p-5">
+            <View className="mx-6 mb-32 rounded-3xl bg-white/15 border border-white/30">
+              <View className="rounded-2xl p-5">
                 <View className="flex-row items-center justify-between mb-4">
                   <Text className="font-semibold text-white">Today's Goal</Text>
                   <Text className="text-2xl">🎯</Text>
@@ -513,7 +532,7 @@ const FitIntervalApp: React.FC = () => {
                     </Text>
                   </View>
                 </View>
-              </BlurView>
+              </View>
             </View>
           </ScrollView>
 
@@ -612,9 +631,6 @@ const styles = StyleSheet.create({
   logo: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: 'white',
   },
   userDetails: {
     gap: 4,
@@ -697,6 +713,7 @@ const styles = StyleSheet.create({
     borderRadius: 124,
     alignItems: 'center',
     justifyContent: 'center',
+    boxShadow: '0 0 10px rgba(255, 255, 255, 0.1)',
   },
   timerInfo: {
     alignItems: 'center',
@@ -775,13 +792,12 @@ const styles = StyleSheet.create({
   },
   workoutCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.3)',
     borderRadius: 12,
     padding: 16,
   },
   workoutCardSelected: {
-    borderWidth: 2,
     borderColor: 'white',
   },
   cardHeader: {
