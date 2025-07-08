@@ -21,9 +21,7 @@ export const BottomButton: React.FC<BottomButtonProps> = ({
         onPress={onPress}
         disabled={disabled}
         className={`w-full py-4 rounded-xl shadow-md flex-row items-center justify-center ${
-          disabled 
-            ? 'bg-gray-400' 
-            : 'bg-[#007AFF] active:bg-blue-700'
+          disabled ? 'bg-gray-400' : 'bg-[#007AFF] active:bg-blue-700'
         }`}
       >
         <Ionicons name={icon} size={20} color="white" />

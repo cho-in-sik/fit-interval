@@ -79,28 +79,29 @@ const WorkoutHistoryScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="#f9fafb" />
+    <LinearGradient colors={['#667eea', '#764ba2']} style={{ flex: 1 }}>
+      <SafeAreaView className="flex-1">
+        <StatusBar barStyle="light-content" />
 
-      {/* Header */}
-      <View className="flex-row items-center justify-between px-4 pb-4 bg-white border-b border-gray-200">
-        <View className="flex-row items-center">
-          <Image
-            source={require('../assets/images/fitinterval.png')}
-            style={{ width: 50, height: 50 }}
-            resizeMode="cover"
-          />
-          <Text className="text-xl font-bold ml-2 text-gray-800">
-            FitInterval
-          </Text>
+        {/* Header */}
+        <View className="flex-row items-center justify-between px-4 pb-4 pt-4">
+          <View className="flex-row items-center">
+            <Image
+              source={require('../assets/images/newFitInterval.png')}
+              style={{ width: 50, height: 50 }}
+              resizeMode="cover"
+            />
+            <Text className="text-xl font-bold ml-2 text-white">
+              FitInterval
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => setDrawerVisible(true)}
+            className="w-10 h-10 items-center justify-center rounded-full bg-white/20"
+          >
+            <Ionicons name="menu" size={20} color="white" />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          onPress={() => setDrawerVisible(true)}
-          className="w-10 h-10 items-center justify-center rounded-full "
-        >
-          <Ionicons name="menu" size={20} color="#374151" />
-        </TouchableOpacity>
-      </View>
 
       <ScrollView
         className="flex-1"
@@ -113,23 +114,23 @@ const WorkoutHistoryScreen: React.FC = () => {
           <View className="mb-8">
             <View className="flex-row gap-4">
               {/* Total Workout Time */}
-              <View className="flex-1 bg-blue-50 rounded-xl p-4 items-center">
+              <View className="flex-1 bg-white/15 rounded-xl border border-white/30 p-4 items-center">
                 <View className="flex items-center justify-center mb-2">
-                  <Ionicons name="time" size={20} color="#3B82F6" />
+                  <Ionicons name="time" size={20} color="#EC4899" />
                 </View>
-                <Text className="text-xs text-gray-600 mb-1">Total Time</Text>
-                <Text className="text-2xl font-bold text-blue-600">
+                <Text className="text-xs text-white opacity-80 mb-1">Total Time</Text>
+                <Text className="text-2xl font-bold text-white">
                   {formatDuration(stats.totalTime)}
                 </Text>
               </View>
 
               {/* Completed Workouts */}
-              <View className="flex-1 bg-green-50 rounded-xl p-4 items-center">
+              <View className="flex-1 bg-white/15 rounded-xl border border-white/30 p-4 items-center">
                 <View className="flex items-center justify-center mb-2">
-                  <Ionicons name="trophy" size={20} color="#059669" />
+                  <Ionicons name="trophy" size={20} color="#10B981" />
                 </View>
-                <Text className="text-xs text-gray-600 mb-1">Completed</Text>
-                <Text className="text-2xl font-bold text-green-600">
+                <Text className="text-xs text-white opacity-80 mb-1">Completed</Text>
+                <Text className="text-2xl font-bold text-white">
                   {stats.totalWorkouts}
                 </Text>
               </View>
@@ -139,22 +140,22 @@ const WorkoutHistoryScreen: React.FC = () => {
           {/* Workout History */}
           <View className="mb-6">
             <View className="flex-row items-center justify-between mb-4">
-              <Text className="text-lg font-semibold text-gray-800">
+              <Text className="text-lg font-semibold text-white">
                 Recent Workouts
               </Text>
-              <View className="bg-gray-100 px-2 py-1 rounded-full">
-                <Text className="text-xs text-gray-500">Free Plan</Text>
+              <View className="bg-white/20 px-2 py-1 rounded-full">
+                <Text className="text-xs text-white opacity-80">Free Plan</Text>
               </View>
             </View>
 
             <View className="space-y-3">
               {workoutRecords.length === 0 ? (
-                <View className="bg-gray-50 rounded-xl p-8 items-center">
-                  <Ionicons name="fitness" size={48} color="#9CA3AF" />
-                  <Text className="text-gray-500 text-center mt-4 text-base">
+                <View className="bg-white/10 rounded-xl p-8 items-center">
+                  <Ionicons name="fitness" size={48} color="white" />
+                  <Text className="text-white text-center mt-4 text-base">
                     No workouts yet
                   </Text>
-                  <Text className="text-gray-400 text-center mt-2 text-sm">
+                  <Text className="text-white opacity-80 text-center mt-2 text-sm">
                     Complete your first workout to see it here!
                   </Text>
                 </View>
@@ -162,7 +163,7 @@ const WorkoutHistoryScreen: React.FC = () => {
                 workoutRecords.map((workout, index) => (
                   <View
                     key={workout.id}
-                    className="bg-white rounded-xl border border-gray-200 p-4 mb-3"
+                    className="bg-white/15 rounded-xl border border-white/30 p-4 mb-3"
                   >
                     <View className="flex-row items-center justify-between mb-3">
                       <View className="flex-row items-center flex-1">
@@ -178,28 +179,28 @@ const WorkoutHistoryScreen: React.FC = () => {
                           />
                         </View>
                         <View className="flex-1">
-                          <Text className="font-medium text-gray-800">
+                          <Text className="font-medium text-white">
                             {workout.title}
                           </Text>
-                          <Text className="text-xs text-gray-600">
+                          <Text className="text-xs text-white opacity-80">
                             {workout.date}
                           </Text>
                         </View>
                       </View>
                       <View className="items-end">
-                        <Text className="text-sm font-semibold text-gray-800">
+                        <Text className="text-sm font-semibold text-white">
                           {formatDuration(workout.duration)}
                         </Text>
-                        <Text className="text-xs text-gray-600">
+                        <Text className="text-xs text-white opacity-80">
                           {workout.sets} sets
                         </Text>
                       </View>
                     </View>
                     <View className="flex-row items-center">
-                      <Text className="text-xs text-gray-600 mr-4">
+                      <Text className="text-xs text-white opacity-80 mr-4">
                         Work: {formatTimeText(workout.workTime)}
                       </Text>
-                      <Text className="text-xs text-gray-600">
+                      <Text className="text-xs text-white opacity-80">
                         Rest: {formatTimeText(workout.restTime)}
                       </Text>
                     </View>
@@ -211,7 +212,7 @@ const WorkoutHistoryScreen: React.FC = () => {
 
           {/* Free Plan Limitation */}
           <LinearGradient
-            colors={['#1d4ed8', '#1e40af']} // bg-blue-700 gradient
+            colors={['#EC4899', '#8B5CF6']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={{ borderRadius: 12, padding: 16, alignItems: 'center' }}
@@ -225,7 +226,7 @@ const WorkoutHistoryScreen: React.FC = () => {
             <Text className="font-semibold text-white mb-1">
               Upgrade to Pro
             </Text>
-            <Text className="text-sm text-blue-200 mb-3 text-center">
+            <Text className="text-sm text-white opacity-90 mb-3 text-center">
               View unlimited workout history and detailed analytics
             </Text>
             <TouchableOpacity
@@ -233,7 +234,7 @@ const WorkoutHistoryScreen: React.FC = () => {
               className="bg-white px-4 py-2 rounded-lg"
               activeOpacity={0.8}
             >
-              <Text className="text-blue-600 font-semibold text-sm">
+              <Text className="text-purple-600 font-semibold text-sm">
                 Upgrade Now
               </Text>
             </TouchableOpacity>
@@ -244,7 +245,8 @@ const WorkoutHistoryScreen: React.FC = () => {
         drawerVisible={drawerVisible}
         setDrawerVisible={setDrawerVisible}
       />
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 

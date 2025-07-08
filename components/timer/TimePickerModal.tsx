@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PanGestureHandler, State, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface TimePickerModalProps {
   visible: boolean;
@@ -133,14 +134,23 @@ export const TimePickerModal: React.FC<TimePickerModalProps> = ({
             </View>
           </View>
 
-          <TouchableOpacity
-            onPress={onConfirm}
-            className="w-full py-4 bg-blue-600 rounded-xl"
-          >
-            <Text className="text-white font-semibold text-center">
-              Confirm
-            </Text>
-          </TouchableOpacity>
+          <View className="w-full rounded-xl overflow-hidden">
+            <LinearGradient
+              colors={['#EC4899', '#8B5CF6']}
+              style={{
+                borderRadius: 12,
+              }}
+            >
+              <TouchableOpacity
+                onPress={onConfirm}
+                className="w-full py-4"
+              >
+                <Text className="text-white font-semibold text-center">
+                  Confirm
+                </Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
         </View>
       </View>
     </Modal>

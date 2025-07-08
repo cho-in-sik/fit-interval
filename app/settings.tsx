@@ -16,6 +16,7 @@ import Drawer from '@/components/Drawer';
 import { useSettingsStore } from '@/store/settingsStore';
 import { permissionService } from '@/services/permissionService';
 import { audioService } from '@/services/audioService';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface SettingsScreenProps {}
 
@@ -116,59 +117,59 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
 
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
-        <View className="flex-1 bg-white">
-          {/* Settings Header */}
-
-          <View className="flex-row items-center justify-between px-4 pb-4 bg-white border-b border-gray-200">
-            <View className="flex-row items-center">
-              <Image
-                source={require('../assets/images/fitinterval.png')}
-                style={{ width: 50, height: 50 }}
-                resizeMode="cover"
-              />
-              <Text className="text-xl font-bold ml-2 text-gray-800">
-                FitInterval
-              </Text>
+    <LinearGradient colors={['#667eea', '#764ba2']} style={{ flex: 1 }}>
+      <SafeAreaView className="flex-1">
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          <View className="flex-1">
+            {/* Settings Header */}
+            <View className="flex-row items-center justify-between px-4 pb-4 pt-4">
+              <View className="flex-row items-center">
+                <Image
+                  source={require('../assets/images/newFitInterval.png')}
+                  style={{ width: 50, height: 50 }}
+                  resizeMode="cover"
+                />
+                <Text className="text-xl font-bold ml-2 text-white">
+                  FitInterval
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setDrawerVisible(true)}
+                className="w-10 h-10 items-center justify-center rounded-full bg-white/20"
+              >
+                <Ionicons name="menu" size={20} color="white" />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              onPress={() => setDrawerVisible(true)}
-              className="w-10 h-10 items-center justify-center rounded-full "
-            >
-              <Ionicons name="menu" size={20} color="#374151" />
-            </TouchableOpacity>
-          </View>
 
           {/* Settings Content */}
           <View className="px-4 py-6 flex-1">
             {/* Audio Section */}
             <View className="mb-8">
-              <Text className="text-lg font-semibold text-neutral-800 mb-4">
+              <Text className="text-lg font-semibold text-white mb-4">
                 Audio
               </Text>
 
               {/* Sound Toggle */}
-              <View className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4 mb-4">
+              <View className="bg-white/15 rounded-xl border border-white/30 p-4 mb-4">
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center flex-1">
-                    <View className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4">
+                    <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
                       <Icon
                         name={soundEnabled ? "volume-high" : "volume-xmark"}
                         size={16}
-                        color="#007AFF"
+                        color="#EC4899"
                         solid
                       />
                     </View>
                     <View className="flex-1">
-                      <Text className="text-base font-medium text-neutral-800">
+                      <Text className="text-base font-medium text-white">
                         Sound
                       </Text>
-                      <Text className="text-sm text-neutral-600">
+                      <Text className="text-sm text-white opacity-80">
                         샘플 오디오 및 음성 안내 활성화
                       </Text>
                     </View>
@@ -176,31 +177,31 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                   <Switch
                     value={soundEnabled}
                     onValueChange={handleSoundToggle}
-                    trackColor={{ false: '#D1D5DB', true: '#007AFF' }}
+                    trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
                     thumbColor="#FFFFFF"
                   />
                 </View>
               </View>
 
               {/* Voice Toggle */}
-              <View className={`bg-white rounded-xl shadow-sm border border-neutral-200 p-4 mb-4 ${
+              <View className={`bg-white/15 rounded-xl border border-white/30 p-4 mb-4 ${
                 !soundEnabled ? 'opacity-50' : 'opacity-100'
               }`}>
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center flex-1">
-                    <View className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4">
+                    <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
                       <Icon
                         name="microphone"
                         size={16}
-                        color={!soundEnabled ? "#9CA3AF" : "#007AFF"}
+                        color={!soundEnabled ? "#9CA3AF" : "#EC4899"}
                         solid
                       />
                     </View>
                     <View className="flex-1">
-                      <Text className={`text-base font-medium ${!soundEnabled ? 'text-neutral-500' : 'text-neutral-800'}`}>
+                      <Text className={`text-base font-medium ${!soundEnabled ? 'text-white opacity-50' : 'text-white'}`}>
                         Voice Guidance
                       </Text>
-                      <Text className={`text-sm ${!soundEnabled ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                      <Text className={`text-sm ${!soundEnabled ? 'text-white opacity-40' : 'text-white opacity-80'}`}>
                         운동/휴식 전환 시 음성 안내
                       </Text>
                     </View>
@@ -208,7 +209,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                   <Switch
                     value={voiceEnabled && soundEnabled}
                     onValueChange={handleVoiceToggle}
-                    trackColor={{ false: '#D1D5DB', true: '#007AFF' }}
+                    trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
                     thumbColor="#FFFFFF"
                     disabled={!soundEnabled}
                   />
@@ -217,23 +218,23 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
 
               {/* Volume Control */}
               <View
-                className={`bg-white rounded-xl shadow-sm border border-neutral-200 p-4 ${
+                className={`bg-white/15 rounded-xl border border-white/30 p-4 ${
                   !soundEnabled ? 'opacity-50' : 'opacity-100'
                 }`}
               >
                 <View className="flex-row items-center mb-4">
                   <View className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4">
-                    <Icon name="volume-low" size={16} color={!soundEnabled ? "#9CA3AF" : "#007AFF"} solid />
+                    <Icon name="volume-low" size={16} color={!soundEnabled ? "#9CA3AF" : "#EC4899"} solid />
                   </View>
                   <View className="flex-1">
-                    <Text className={`text-base font-medium ${!soundEnabled ? 'text-neutral-500' : 'text-neutral-800'}`}>
+                    <Text className={`text-base font-medium ${!soundEnabled ? 'text-white opacity-50' : 'text-white'}`}>
                       Volume
                     </Text>
-                    <Text className={`text-sm ${!soundEnabled ? 'text-neutral-400' : 'text-neutral-600'}`}>
+                    <Text className={`text-sm ${!soundEnabled ? 'text-white opacity-40' : 'text-white opacity-80'}`}>
                       샘플 오디오 볼륨 (음성은 시스템 볼륨 사용)
                     </Text>
                   </View>
-                  <Text className={`text-lg font-semibold ${!soundEnabled ? 'text-neutral-400' : 'text-blue-600'}`}>
+                  <Text className={`text-lg font-semibold ${!soundEnabled ? 'text-white opacity-40' : 'text-white'}`}>
                     {volume}%
                   </Text>
                 </View>
@@ -248,9 +249,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                       value={volume}
                       onValueChange={handleVolumeChange}
                       onSlidingComplete={handleVolumeTest}
-                      minimumTrackTintColor={!soundEnabled ? "#D1D5DB" : "#007AFF"}
+                      minimumTrackTintColor={!soundEnabled ? "#D1D5DB" : "#EC4899"}
                       maximumTrackTintColor="#E5E7EB"
-                      thumbTintColor={!soundEnabled ? "#D1D5DB" : "#007AFF"}
+                      thumbTintColor={!soundEnabled ? "#D1D5DB" : "#EC4899"}
                       disabled={!soundEnabled}
                     />
                   </View>
@@ -261,27 +262,27 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
 
             {/* Haptic Section */}
             <View className="mb-8">
-              <Text className="text-lg font-semibold text-neutral-800 mb-4">
+              <Text className="text-lg font-semibold text-white mb-4">
                 Haptic Feedback
               </Text>
 
               {/* Vibration Toggle */}
-              <View className="bg-white rounded-xl shadow-sm border border-neutral-200 p-4">
+              <View className="bg-white/15 rounded-xl border border-white/30 p-4">
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center flex-1">
-                    <View className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4">
+                    <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
                       <Icon
                         name="mobile-screen-button"
                         size={16}
-                        color="#007AFF"
+                        color="#EC4899"
                         solid
                       />
                     </View>
                     <View className="flex-1">
-                      <Text className="text-base font-medium text-neutral-800">
+                      <Text className="text-base font-medium text-white">
                         Vibration
                       </Text>
-                      <Text className="text-sm text-neutral-600">
+                      <Text className="text-sm text-white opacity-80">
                         Tactile feedback for intervals
                       </Text>
                     </View>
@@ -289,7 +290,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                   <Switch
                     value={vibrationEnabled}
                     onValueChange={handleVibrationToggle}
-                    trackColor={{ false: '#D1D5DB', true: '#007AFF' }}
+                    trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
                     thumbColor="#FFFFFF"
                   />
                 </View>
@@ -297,18 +298,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
             </View>
 
             {/* About Section */}
-            <View className="mt-8 pt-6 border-t border-neutral-200 flex-1 justify-center">
+            <View className="mt-8 pt-6 border-t border-white/30 flex-1 justify-center">
               <View className="items-center">
-                <View className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-3">
-                  <Icon name="stopwatch" size={28} color="#007AFF" solid />
+                <View className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
+                  <Icon name="stopwatch" size={28} color="white" solid />
                 </View>
-                <Text className="text-lg font-semibold text-neutral-800 mb-1">
+                <Text className="text-lg font-semibold text-white mb-1">
                   FitInterval
                 </Text>
-                <Text className="text-sm text-neutral-600 mb-2">
+                <Text className="text-sm text-white opacity-80 mb-2">
                   Version 1.0.0
                 </Text>
-                <Text className="text-xs text-neutral-500">
+                <Text className="text-xs text-white opacity-60">
                   Simple interval training timer
                 </Text>
               </View>
@@ -320,7 +321,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
         drawerVisible={drawerVisible}
         setDrawerVisible={setDrawerVisible}
       />
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 

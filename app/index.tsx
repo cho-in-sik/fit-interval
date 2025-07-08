@@ -17,7 +17,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from '@/components/Drawer';
-import { TimerSettings } from '@/components/timer/TimerSettings';
 import { TimePickerModal } from '@/components/timer/TimePickerModal';
 import { useTimerSettings } from '@/hooks/useTimerSettings';
 import { useTimePicker } from '@/hooks/useTimePicker';
@@ -263,38 +262,62 @@ const FitIntervalApp: React.FC = () => {
       animationType="slide"
       onRequestClose={() => setTimeModalVisible(false)}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>운동 시간 설정</Text>
+      <View className="flex-1 bg-black/50 justify-end">
+        <View className="bg-white rounded-t-2xl p-5">
+          <View className="flex-row justify-between items-center mb-5">
+            <Text className="text-lg font-semibold text-gray-800">
+              세트 설정
+            </Text>
             <TouchableOpacity
               onPress={() => setTimeModalVisible(false)}
-              style={styles.modalCloseButton}
+              className="w-8 h-8 items-center justify-center rounded-full bg-gray-100"
             >
-              <Ionicons name="close" size={20} color="#666" />
+              <Ionicons name="close" size={16} color="#374151" />
             </TouchableOpacity>
           </View>
 
-          <TimerSettings
-            workTime={settings.workTime}
-            restTime={settings.restTime}
-            sets={settings.sets}
-            onWorkTimePress={handleWorkTimePress}
-            onRestTimePress={handleRestTimePress}
-            onSetsAdjust={handleSetsAdjust}
-          />
+          <View className="flex-row justify-center items-center mb-8">
+            <View className="items-center">
+              <Text className="text-xs text-gray-600 mb-1">Sets</Text>
+              <View className="items-center">
+                <TouchableOpacity
+                  onPress={() => handleSetsAdjust('up')}
+                  className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mb-2"
+                >
+                  <Ionicons name="chevron-up" size={16} color="#374151" />
+                </TouchableOpacity>
+                <View className="w-16 h-16 items-center justify-center bg-gray-50 rounded-xl">
+                  <Text className="text-3xl font-bold">
+                    {settings.sets.toString().padStart(2, '0')}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => handleSetsAdjust('down')}
+                  className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mt-2"
+                >
+                  <Ionicons name="chevron-down" size={16} color="#374151" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
 
-          <LinearGradient
-            colors={['#EC4899', '#8B5CF6']}
-            style={styles.confirmButton}
-          >
-            <TouchableOpacity
-              onPress={() => setTimeModalVisible(false)}
-              style={styles.confirmButtonInner}
+          <View className="w-full rounded-xl overflow-hidden">
+            <LinearGradient
+              colors={['#EC4899', '#8B5CF6']}
+              style={{
+                borderRadius: 12,
+              }}
             >
-              <Text style={styles.confirmButtonText}>확인</Text>
-            </TouchableOpacity>
-          </LinearGradient>
+              <TouchableOpacity
+                onPress={() => setTimeModalVisible(false)}
+                className="w-full py-4"
+              >
+                <Text className="text-white font-semibold text-center">
+                  확인
+                </Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
         </View>
       </View>
     </Modal>
@@ -503,25 +526,27 @@ const FitIntervalApp: React.FC = () => {
                 </View>
               </GlassMorphismView>
             </View> */}
+            <Text className="mx-6" style={styles.templatesTitle}>
+              Today&apos;s Goal
+            </Text>
             <View className="mx-6 mb-32 rounded-3xl bg-white/15 border border-white/30">
               <View className="rounded-2xl p-5">
-                <View className="flex-row items-center justify-between mb-4">
-                  <Text className="font-semibold text-white">Today's Goal</Text>
+                {/* <View className="flex-row items-center justify-between mb-4">
                   <Text className="text-2xl">🎯</Text>
-                </View>
+                </View> */}
                 <View className="flex-row items-center space-x-4">
                   <View className="flex-1">
-                    <View className="flex-row justify-between mb-2">
+                    <View className="flex-row justify-between mb-2 mr-5">
                       <Text className="text-sm text-white">Workouts</Text>
                       <Text className="text-sm text-white">2/3</Text>
                     </View>
-                    <View className="w-full bg-white bg-opacity-20 rounded-full h-3">
+                    <View className="w-[95%] bg-white bg-opacity-20 rounded-full h-3 ">
                       <LinearGradient
                         colors={['#10B981', '#EC4899']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         className="h-3 rounded-full"
-                        style={{ width: '67%' }}
+                        style={{ width: '100%' }}
                       />
                     </View>
                   </View>
@@ -912,15 +937,15 @@ const styles = StyleSheet.create({
   },
   startButtonInner: {
     width: '100%',
-    paddingVertical: 20,
+    paddingVertical: 18,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 12,
   },
   startButtonIcon: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 24,
     alignItems: 'center',
