@@ -116,17 +116,14 @@ export default function Drawer({ drawerVisible, setDrawerVisible }: any) {
           ]}
           className="h-full shadow-2xl ml-auto rounded-2xl overflow-hidden"
         >
-          <LinearGradient
-            colors={['#667eea', '#764ba2']}
-            style={{ flex: 1 }}
-          >
+          <LinearGradient colors={['#667eea', '#764ba2']} style={{ flex: 1 }}>
             <TouchableOpacity activeOpacity={1} className="flex-1">
               <SafeAreaView className="flex-1 p-5 mx-3">
                 <View className="flex-row justify-between items-center mb-12 mt-2">
                   <Text className="text-2xl font-bold text-white">Menu</Text>
                   <TouchableOpacity
                     onPress={closeDrawer}
-                    className="w-8 h-8 items-center justify-center rounded-full bg-white/20"
+                    className="w-8 h-8 items-center justify-center rounded-full"
                   >
                     <Ionicons name="close" size={24} color="white" />
                   </TouchableOpacity>

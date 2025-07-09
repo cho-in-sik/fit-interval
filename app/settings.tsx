@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Image,
   AppState,
+  Alert,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/FontAwesome6';
@@ -18,9 +19,7 @@ import { permissionService } from '@/services/permissionService';
 import { audioService } from '@/services/audioService';
 import { LinearGradient } from 'expo-linear-gradient';
 
-interface SettingsScreenProps {}
-
-const SettingsScreen: React.FC<SettingsScreenProps> = () => {
+const SettingsScreen: React.FC = () => {
   const {
     audio,
     setSoundEnabled,
@@ -33,7 +32,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
   const [soundEnabled, setSoundEnabledLocal] = useState(audio.soundEnabled);
   const [voiceEnabled, setVoiceEnabledLocal] = useState(audio.voiceEnabled);
   const [volume, setVolumeLocal] = useState(audio.volume);
-  const [vibrationEnabled, setVibrationEnabledLocal] = useState(audio.vibrationEnabled);
+  const [vibrationEnabled, setVibrationEnabledLocal] = useState(
+    audio.vibrationEnabled,
+  );
 
   useEffect(() => {
     setSoundEnabledLocal(audio.soundEnabled);
@@ -57,7 +58,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
       }
     };
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener(
+      'change',
+      handleAppStateChange,
+    );
     return () => subscription?.remove();
   }, []);
 
@@ -66,12 +70,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
     if (!value) {
       await audioService.stopAllAudio();
     }
-    
+
     // 권한이 없으면 토글 비활성화
     if (value) {
       const permissions = permissionService.getPermissionStatus();
       if (!permissions.audio) {
-        alert('오디오 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.');
+        Alert.alert(
+          '권한 필요',
+          '오디오 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.'
+        );
         return;
       }
     }
@@ -94,7 +101,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
     if (soundEnabled) {
       await audioService.initialize();
       await audioService.playWorkSound(volume, soundEnabled);
-      
+
       // 3초 후 자동으로 중단
       setTimeout(() => {
         audioService.stopAllAudio();
@@ -106,7 +113,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
     if (value) {
       const permissions = permissionService.getPermissionStatus();
       if (!permissions.haptics) {
-        alert('진동 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.');
+        Alert.alert(
+          '권한 필요',
+          '진동 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.'
+        );
         return;
       }
       await audioService.triggerHapticFeedback(true, 'medium');
@@ -114,7 +124,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
     setVibrationEnabledLocal(value);
     setVibrationEnabled(value);
   };
-
 
   return (
     <LinearGradient colors={['#667eea', '#764ba2']} style={{ flex: 1 }}>
@@ -139,188 +148,233 @@ const SettingsScreen: React.FC<SettingsScreenProps> = () => {
               </View>
               <TouchableOpacity
                 onPress={() => setDrawerVisible(true)}
-                className="w-10 h-10 items-center justify-center rounded-full bg-white/20"
+                className="w-10 h-10 items-center justify-center rounded-full"
               >
                 <Ionicons name="menu" size={20} color="white" />
               </TouchableOpacity>
             </View>
 
-          {/* Settings Content */}
-          <View className="px-4 py-6 flex-1">
-            {/* Audio Section */}
-            <View className="mb-8">
-              <Text className="text-lg font-semibold text-white mb-4">
-                Audio
-              </Text>
+            {/* Settings Content */}
+            <View className="px-4 py-6 flex-1">
+              {/* Audio Section */}
+              <View className="mb-8">
+                <Text className="text-lg font-semibold text-white mb-4">
+                  Audio
+                </Text>
 
-              {/* Sound Toggle */}
-              <View className="bg-white/15 rounded-xl border border-white/30 p-4 mb-4">
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center flex-1">
-                    <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                      <Icon
-                        name={soundEnabled ? "volume-high" : "volume-xmark"}
-                        size={16}
-                        color="#EC4899"
-                        solid
-                      />
+                {/* Sound Toggle */}
+                <View className="bg-white/15 rounded-xl border border-white/30 p-4 mb-4">
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center flex-1">
+                      <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <Icon
+                          name={soundEnabled ? 'volume-high' : 'volume-xmark'}
+                          size={16}
+                          color="#EC4899"
+                          solid
+                        />
+                      </View>
+                      <View className="flex-1">
+                        <Text className="text-base font-medium text-white">
+                          Sound
+                        </Text>
+                        <Text className="text-sm text-white opacity-80">
+                          샘플 오디오 및 음성 안내 활성화
+                        </Text>
+                      </View>
                     </View>
-                    <View className="flex-1">
-                      <Text className="text-base font-medium text-white">
-                        Sound
-                      </Text>
-                      <Text className="text-sm text-white opacity-80">
-                        샘플 오디오 및 음성 안내 활성화
-                      </Text>
-                    </View>
+                    <Switch
+                      value={soundEnabled}
+                      onValueChange={handleSoundToggle}
+                      trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
+                      thumbColor="#FFFFFF"
+                    />
                   </View>
-                  <Switch
-                    value={soundEnabled}
-                    onValueChange={handleSoundToggle}
-                    trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
-                    thumbColor="#FFFFFF"
-                  />
-                </View>
-              </View>
-
-              {/* Voice Toggle */}
-              <View className={`bg-white/15 rounded-xl border border-white/30 p-4 mb-4 ${
-                !soundEnabled ? 'opacity-50' : 'opacity-100'
-              }`}>
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center flex-1">
-                    <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                      <Icon
-                        name="microphone"
-                        size={16}
-                        color={!soundEnabled ? "#9CA3AF" : "#EC4899"}
-                        solid
-                      />
-                    </View>
-                    <View className="flex-1">
-                      <Text className={`text-base font-medium ${!soundEnabled ? 'text-white opacity-50' : 'text-white'}`}>
-                        Voice Guidance
-                      </Text>
-                      <Text className={`text-sm ${!soundEnabled ? 'text-white opacity-40' : 'text-white opacity-80'}`}>
-                        운동/휴식 전환 시 음성 안내
-                      </Text>
-                    </View>
-                  </View>
-                  <Switch
-                    value={voiceEnabled && soundEnabled}
-                    onValueChange={handleVoiceToggle}
-                    trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
-                    thumbColor="#FFFFFF"
-                    disabled={!soundEnabled}
-                  />
-                </View>
-              </View>
-
-              {/* Volume Control */}
-              <View
-                className={`bg-white/15 rounded-xl border border-white/30 p-4 ${
-                  !soundEnabled ? 'opacity-50' : 'opacity-100'
-                }`}
-              >
-                <View className="flex-row items-center mb-4">
-                  <View className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4">
-                    <Icon name="volume-low" size={16} color={!soundEnabled ? "#9CA3AF" : "#EC4899"} solid />
-                  </View>
-                  <View className="flex-1">
-                    <Text className={`text-base font-medium ${!soundEnabled ? 'text-white opacity-50' : 'text-white'}`}>
-                      Volume
-                    </Text>
-                    <Text className={`text-sm ${!soundEnabled ? 'text-white opacity-40' : 'text-white opacity-80'}`}>
-                      샘플 오디오 볼륨 (음성은 시스템 볼륨 사용)
-                    </Text>
-                  </View>
-                  <Text className={`text-lg font-semibold ${!soundEnabled ? 'text-white opacity-40' : 'text-white'}`}>
-                    {volume}%
-                  </Text>
                 </View>
 
-                <View className="flex-row items-center space-x-3">
-                  <Icon name="volume-off" size={14} color={!soundEnabled ? "#D1D5DB" : "#9CA3AF"} solid />
-                  <View className="flex-1 mx-3">
-                    <Slider
-                      style={{ width: '100%', height: 40 }}
-                      minimumValue={0}
-                      maximumValue={100}
-                      value={volume}
-                      onValueChange={handleVolumeChange}
-                      onSlidingComplete={handleVolumeTest}
-                      minimumTrackTintColor={!soundEnabled ? "#D1D5DB" : "#EC4899"}
-                      maximumTrackTintColor="#E5E7EB"
-                      thumbTintColor={!soundEnabled ? "#D1D5DB" : "#EC4899"}
+                {/* Voice Toggle */}
+                <View
+                  className={`bg-white/15 rounded-xl border border-white/30 p-4 mb-4 ${
+                    !soundEnabled ? 'opacity-50' : 'opacity-100'
+                  }`}
+                >
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center flex-1">
+                      <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <Icon
+                          name="microphone"
+                          size={16}
+                          color={!soundEnabled ? '#9CA3AF' : '#EC4899'}
+                          solid
+                        />
+                      </View>
+                      <View className="flex-1">
+                        <Text
+                          className={`text-base font-medium ${
+                            !soundEnabled
+                              ? 'text-white opacity-50'
+                              : 'text-white'
+                          }`}
+                        >
+                          Voice Guidance
+                        </Text>
+                        <Text
+                          className={`text-sm ${
+                            !soundEnabled
+                              ? 'text-white opacity-40'
+                              : 'text-white opacity-80'
+                          }`}
+                        >
+                          운동/휴식 전환 시 음성 안내
+                        </Text>
+                      </View>
+                    </View>
+                    <Switch
+                      value={voiceEnabled && soundEnabled}
+                      onValueChange={handleVoiceToggle}
+                      trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
+                      thumbColor="#FFFFFF"
                       disabled={!soundEnabled}
                     />
                   </View>
-                  <Icon name="volume-high" size={14} color={!soundEnabled ? "#D1D5DB" : "#9CA3AF"} solid />
                 </View>
-              </View>
-            </View>
 
-            {/* Haptic Section */}
-            <View className="mb-8">
-              <Text className="text-lg font-semibold text-white mb-4">
-                Haptic Feedback
-              </Text>
-
-              {/* Vibration Toggle */}
-              <View className="bg-white/15 rounded-xl border border-white/30 p-4">
-                <View className="flex-row items-center justify-between">
-                  <View className="flex-row items-center flex-1">
-                    <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                {/* Volume Control */}
+                <View
+                  className={`bg-white/15 rounded-xl border border-white/30 p-4 ${
+                    !soundEnabled ? 'opacity-50' : 'opacity-100'
+                  }`}
+                >
+                  <View className="flex-row items-center mb-4">
+                    <View className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mr-4">
                       <Icon
-                        name="mobile-screen-button"
+                        name="volume-low"
                         size={16}
-                        color="#EC4899"
+                        color={!soundEnabled ? '#9CA3AF' : '#EC4899'}
                         solid
                       />
                     </View>
                     <View className="flex-1">
-                      <Text className="text-base font-medium text-white">
-                        Vibration
+                      <Text
+                        className={`text-base font-medium ${
+                          !soundEnabled ? 'text-white opacity-50' : 'text-white'
+                        }`}
+                      >
+                        Volume
                       </Text>
-                      <Text className="text-sm text-white opacity-80">
-                        Tactile feedback for intervals
+                      <Text
+                        className={`text-sm ${
+                          !soundEnabled
+                            ? 'text-white opacity-40'
+                            : 'text-white opacity-80'
+                        }`}
+                      >
+                        샘플 오디오 볼륨 (음성은 시스템 볼륨 사용)
                       </Text>
                     </View>
+                    <Text
+                      className={`text-lg font-semibold ${
+                        !soundEnabled ? 'text-white opacity-40' : 'text-white'
+                      }`}
+                    >
+                      {volume}%
+                    </Text>
                   </View>
-                  <Switch
-                    value={vibrationEnabled}
-                    onValueChange={handleVibrationToggle}
-                    trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
-                    thumbColor="#FFFFFF"
-                  />
+
+                  <View className="flex-row items-center space-x-3">
+                    <Icon
+                      name="volume-off"
+                      size={14}
+                      color={!soundEnabled ? '#D1D5DB' : '#9CA3AF'}
+                      solid
+                    />
+                    <View className="flex-1 mx-3">
+                      <Slider
+                        style={{ width: '100%', height: 40 }}
+                        minimumValue={0}
+                        maximumValue={100}
+                        value={volume}
+                        onValueChange={handleVolumeChange}
+                        onSlidingComplete={handleVolumeTest}
+                        minimumTrackTintColor={
+                          !soundEnabled ? '#D1D5DB' : '#EC4899'
+                        }
+                        maximumTrackTintColor="#E5E7EB"
+                        thumbTintColor={!soundEnabled ? '#D1D5DB' : '#EC4899'}
+                        disabled={!soundEnabled}
+                      />
+                    </View>
+                    <Icon
+                      name="volume-high"
+                      size={14}
+                      color={!soundEnabled ? '#D1D5DB' : '#9CA3AF'}
+                      solid
+                    />
+                  </View>
                 </View>
               </View>
-            </View>
 
-            {/* About Section */}
-            <View className="mt-8 pt-6 border-t border-white/30 flex-1 justify-center">
-              <View className="items-center">
-                <View className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
-                  <Icon name="stopwatch" size={28} color="white" solid />
+              {/* Haptic Section */}
+              <View className="mb-8">
+                <Text className="text-lg font-semibold text-white mb-4">
+                  Haptic Feedback
+                </Text>
+
+                {/* Vibration Toggle */}
+                <View className="bg-white/15 rounded-xl border border-white/30 p-4">
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center flex-1">
+                      <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                        <Icon
+                          name="mobile-screen-button"
+                          size={16}
+                          color="#EC4899"
+                          solid
+                        />
+                      </View>
+                      <View className="flex-1">
+                        <Text className="text-base font-medium text-white">
+                          Vibration
+                        </Text>
+                        <Text className="text-sm text-white opacity-80">
+                          Tactile feedback for intervals
+                        </Text>
+                      </View>
+                    </View>
+                    <Switch
+                      value={vibrationEnabled}
+                      onValueChange={handleVibrationToggle}
+                      trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
+                      thumbColor="#FFFFFF"
+                    />
+                  </View>
                 </View>
-                <Text className="text-lg font-semibold text-white mb-1">
-                  FitInterval
-                </Text>
-                <Text className="text-sm text-white opacity-80 mb-2">
-                  Version 1.0.0
-                </Text>
-                <Text className="text-xs text-white opacity-60">
-                  Simple interval training timer
-                </Text>
+              </View>
+
+              {/* About Section */}
+              <View className="mt-8 pt-6 border-t border-white/30 flex-1 justify-center">
+                <View className="items-center">
+                  <View className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-3">
+                    <Icon name="stopwatch" size={28} color="white" solid />
+                  </View>
+                  <Text className="text-lg font-semibold text-white mb-1">
+                    FitInterval
+                  </Text>
+                  <Text className="text-sm text-white opacity-80 mb-2">
+                    Version 1.0.0
+                  </Text>
+                  <Text className="text-xs text-white opacity-60">
+                    Simple interval training timer
+                  </Text>
+                </View>
               </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
-      <Drawer
-        drawerVisible={drawerVisible}
-        setDrawerVisible={setDrawerVisible}
-      />
+        </ScrollView>
+        <Drawer
+          drawerVisible={drawerVisible}
+          setDrawerVisible={setDrawerVisible}
+        />
       </SafeAreaView>
     </LinearGradient>
   );
