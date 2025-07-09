@@ -317,8 +317,14 @@ const FitIntervalTimer: React.FC = () => {
           };
         } else {
           // 마지막 세트면 운동 완료
+          audioService.triggerHapticFeedback(
+            audio.vibrationEnabled,
+            'heavy',
+          );
+          setShowCompleteModal(true);
           return {
             ...prev,
+            isRunning: false,
             timeRemaining: 0,
           };
         }

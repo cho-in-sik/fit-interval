@@ -131,7 +131,6 @@ const FitIntervalApp: React.FC = () => {
     openTimePicker('rest', settings.restTime);
   };
 
-
   const handleTimePickerConfirm = () => {
     if (timePickerModal.type === 'sets') {
       updateSets(timePickerModal.minutes);
@@ -150,48 +149,51 @@ const FitIntervalApp: React.FC = () => {
     closeTimePicker();
   };
 
-  const templates: Template[] = useMemo(() => [
-    {
-      id: 1,
-      name: 'Beginner',
-      icon: '🌱',
-      work: 40,
-      rest: 30,
-      sets: 6,
-      difficulty: 0.3,
-      color: '#10B981',
-    },
-    {
-      id: 2,
-      name: 'HIIT Beast',
-      icon: '🔥',
-      work: 45,
-      rest: 15,
-      sets: 10,
-      difficulty: 0.8,
-      color: '#EC4899',
-    },
-    {
-      id: 3,
-      name: 'Tabata',
-      icon: '⚡',
-      work: 20,
-      rest: 10,
-      sets: 8,
-      difficulty: 0.6,
-      color: '#F59E0B',
-    },
-    {
-      id: 4,
-      name: 'Custom',
-      icon: '⚙️',
-      work: settings.workTime.minutes * 60 + settings.workTime.seconds,
-      rest: settings.restTime.minutes * 60 + settings.restTime.seconds,
-      sets: settings.sets,
-      difficulty: 0.5,
-      color: '#6366F1',
-    },
-  ], [settings.workTime, settings.restTime, settings.sets]);
+  const templates: Template[] = useMemo(
+    () => [
+      {
+        id: 1,
+        name: 'Beginner',
+        icon: '🌱',
+        work: 40,
+        rest: 30,
+        sets: 6,
+        difficulty: 0.3,
+        color: '#10B981',
+      },
+      {
+        id: 2,
+        name: 'HIIT Beast',
+        icon: '🔥',
+        work: 45,
+        rest: 15,
+        sets: 10,
+        difficulty: 0.8,
+        color: '#EC4899',
+      },
+      {
+        id: 3,
+        name: 'Tabata',
+        icon: '⚡',
+        work: 20,
+        rest: 10,
+        sets: 8,
+        difficulty: 0.6,
+        color: '#F59E0B',
+      },
+      {
+        id: 4,
+        name: 'Custom',
+        icon: '⚙️',
+        work: settings.workTime.minutes * 60 + settings.workTime.seconds,
+        rest: settings.restTime.minutes * 60 + settings.restTime.seconds,
+        sets: settings.sets,
+        difficulty: 0.5,
+        color: '#6366F1',
+      },
+    ],
+    [settings.workTime, settings.restTime, settings.sets],
+  );
 
   // const GlassMorphismView: React.FC<{
   //   children: React.ReactNode;
@@ -250,7 +252,6 @@ const FitIntervalApp: React.FC = () => {
       </TouchableOpacity>
     );
   };
-
 
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -394,7 +395,9 @@ const FitIntervalApp: React.FC = () => {
                     ]}
                   >
                     <TouchableOpacity
-                      onPress={() => openTimePicker('sets', { sets: settings.sets })}
+                      onPress={() =>
+                        openTimePicker('sets', { sets: settings.sets })
+                      }
                       style={styles.floatingButtonInner}
                     >
                       <Ionicons name="repeat" size={20} color="#10B981" />
@@ -429,40 +432,12 @@ const FitIntervalApp: React.FC = () => {
             </View>
 
             {/* Achievement & Motivation */}
-            {/* <View style={[styles.section, styles.motivationSection]}>
-              <GlassMorphismView style={styles.motivationCard}>
-                <View style={styles.motivationHeader}>
-                  <Text style={styles.motivationTitle}>오늘의 목표</Text>
-                  <Text style={styles.motivationEmoji}>🎯</Text>
-                </View>
-                <View style={styles.motivationContent}>
-                  <View style={styles.motivationProgress}>
-                    <View style={styles.motivationStats}>
-                      <Text style={styles.motivationLabel}>운동 횟수</Text>
-                      <Text style={styles.motivationCount}>2/3</Text>
-                    </View>
-                    <View style={styles.motivationBar}>
-                      <LinearGradient
-                        colors={['#10B981', '#EC4899']}
-                        style={styles.motivationFill}
-                      />
-                    </View>
-                  </View>
-                  <View style={styles.motivationPercentage}>
-                    <Text style={styles.motivationPercent}>67%</Text>
-                    <Text style={styles.motivationComplete}>완료</Text>
-                  </View>
-                </View>
-              </GlassMorphismView>
-            </View> */}
-            <Text className="mx-6" style={styles.templatesTitle}>
+
+            {/* <Text className="mx-6" style={styles.templatesTitle}>
               Today&apos;s Goal
-            </Text>
-            <View className="mx-6 mb-32 rounded-3xl bg-white/15 border border-white/30">
-              <View className="rounded-2xl p-5">
-                {/* <View className="flex-row items-center justify-between mb-4">
-                  <Text className="text-2xl">🎯</Text>
-                </View> */}
+            </Text> */}
+            <View className="mx-6 mb-32 rounded-3xl bg-white/15 border-white/30">
+              {/* <View className="rounded-2xl p-5">
                 <View className="flex-row items-center space-x-4">
                   <View className="flex-1">
                     <View className="flex-row justify-between mb-2 mr-5">
@@ -486,7 +461,7 @@ const FitIntervalApp: React.FC = () => {
                     </Text>
                   </View>
                 </View>
-              </View>
+              </View> */}
             </View>
           </ScrollView>
 
