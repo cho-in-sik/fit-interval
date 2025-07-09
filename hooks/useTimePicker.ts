@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 export interface TimePickerState {
   visible: boolean;
-  type: 'work' | 'rest';
+  type: 'work' | 'rest' | 'sets';
   minutes: number;
   seconds: number;
 }
@@ -16,15 +16,26 @@ export const useTimePicker = () => {
   });
 
   const openTimePicker = (
-    type: 'work' | 'rest',
-    currentTime: { minutes: number; seconds: number }
+    type: 'work' | 'rest' | 'sets',
+    currentTime: { minutes: number; seconds: number } | { sets: number }
   ) => {
-    setTimePickerModal({
-      visible: true,
-      type,
-      minutes: currentTime.minutes,
-      seconds: currentTime.seconds,
-    });
+    if (type === 'sets') {
+      const setsData = currentTime as { sets: number };
+      setTimePickerModal({
+        visible: true,
+        type,
+        minutes: setsData.sets,
+        seconds: 0,
+      });
+    } else {
+      const timeData = currentTime as { minutes: number; seconds: number };
+      setTimePickerModal({
+        visible: true,
+        type,
+        minutes: timeData.minutes,
+        seconds: timeData.seconds,
+      });
+    }
   };
 
   const closeTimePicker = () => {
@@ -37,8 +48,14 @@ export const useTimePicker = () => {
   ) => {
     setTimePickerModal((prev) => {
       const newValue = prev[type] + (direction === 'up' ? 1 : -1);
-      const min = 0;
-      const max = type === 'minutes' ? 59 : 59;
+      let min = 0;
+      let max = type === 'minutes' ? 59 : 59;
+
+      // 세트 모드일 때는 minutes 필드를 세트 수로 사용
+      if (prev.type === 'sets' && type === 'minutes') {
+        min = 1;
+        max = 99;
+      }
 
       return {
         ...prev,

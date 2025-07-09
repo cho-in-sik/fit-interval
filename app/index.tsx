@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
+// import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import Drawer from '@/components/Drawer';
 import { TimePickerModal } from '@/components/timer/TimePickerModal';
@@ -51,7 +51,6 @@ const FitIntervalApp: React.FC = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [workoutTitle, setWorkoutTitle] = useState('Work');
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null);
-  const [timeModalVisible, setTimeModalVisible] = useState(false);
 
   // Animated values
   const floatAnim1 = useRef(new Animated.Value(0)).current;
@@ -117,7 +116,7 @@ const FitIntervalApp: React.FC = () => {
         useNativeDriver: true,
       }),
     ).start();
-  }, []);
+  }, [floatAnim1, floatAnim2, floatAnim3, glowAnim, spinAnim]);
 
   const spin = spinAnim.interpolate({
     inputRange: [0, 1],
@@ -132,37 +131,34 @@ const FitIntervalApp: React.FC = () => {
     openTimePicker('rest', settings.restTime);
   };
 
-  const handleSetsAdjust = (direction: 'up' | 'down') => {
-    const newSets = Math.max(
-      1,
-      Math.min(99, settings.sets + (direction === 'up' ? 1 : -1)),
-    );
-    updateSets(newSets);
-  };
 
   const handleTimePickerConfirm = () => {
-    const newTime = {
-      minutes: timePickerModal.minutes,
-      seconds: timePickerModal.seconds,
-    };
-
-    if (timePickerModal.type === 'work') {
-      updateWorkTime(newTime);
+    if (timePickerModal.type === 'sets') {
+      updateSets(timePickerModal.minutes);
     } else {
-      updateRestTime(newTime);
+      const newTime = {
+        minutes: timePickerModal.minutes,
+        seconds: timePickerModal.seconds,
+      };
+
+      if (timePickerModal.type === 'work') {
+        updateWorkTime(newTime);
+      } else {
+        updateRestTime(newTime);
+      }
     }
     closeTimePicker();
   };
 
-  const templates: Template[] = [
+  const templates: Template[] = useMemo(() => [
     {
       id: 1,
       name: 'Beginner',
       icon: '🌱',
-      work: 30,
+      work: 40,
       rest: 30,
       sets: 6,
-      difficulty: 0.25,
+      difficulty: 0.3,
       color: '#10B981',
     },
     {
@@ -195,17 +191,17 @@ const FitIntervalApp: React.FC = () => {
       difficulty: 0.5,
       color: '#6366F1',
     },
-  ];
+  ], [settings.workTime, settings.restTime, settings.sets]);
 
-  const GlassMorphismView: React.FC<{
-    children: React.ReactNode;
-    style?: any;
-    intensity?: number;
-  }> = ({ children, style, intensity = 20 }) => (
-    <BlurView intensity={intensity} style={[styles.glassContainer, style]}>
-      <View style={[styles.glassInner, style]}>{children}</View>
-    </BlurView>
-  );
+  // const GlassMorphismView: React.FC<{
+  //   children: React.ReactNode;
+  //   style?: any;
+  //   intensity?: number;
+  // }> = ({ children, style, intensity = 20 }) => (
+  //   <BlurView intensity={intensity} style={[styles.glassContainer, style]}>
+  //     <View style={[styles.glassInner, style]}>{children}</View>
+  //   </BlurView>
+  // );
 
   const WorkoutCard: React.FC<{ template: Template }> = ({ template }) => {
     const handleTemplatePress = () => {
@@ -255,73 +251,6 @@ const FitIntervalApp: React.FC = () => {
     );
   };
 
-  const CustomTimeModal: React.FC = () => (
-    <Modal
-      visible={timeModalVisible}
-      transparent
-      animationType="slide"
-      onRequestClose={() => setTimeModalVisible(false)}
-    >
-      <View className="flex-1 bg-black/50 justify-end">
-        <View className="bg-white rounded-t-2xl p-5">
-          <View className="flex-row justify-between items-center mb-5">
-            <Text className="text-lg font-semibold text-gray-800">
-              세트 설정
-            </Text>
-            <TouchableOpacity
-              onPress={() => setTimeModalVisible(false)}
-              className="w-8 h-8 items-center justify-center rounded-full bg-gray-100"
-            >
-              <Ionicons name="close" size={16} color="#374151" />
-            </TouchableOpacity>
-          </View>
-
-          <View className="flex-row justify-center items-center mb-8">
-            <View className="items-center">
-              <Text className="text-xs text-gray-600 mb-1">Sets</Text>
-              <View className="items-center">
-                <TouchableOpacity
-                  onPress={() => handleSetsAdjust('up')}
-                  className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mb-2"
-                >
-                  <Ionicons name="chevron-up" size={16} color="#374151" />
-                </TouchableOpacity>
-                <View className="w-16 h-16 items-center justify-center bg-gray-50 rounded-xl">
-                  <Text className="text-3xl font-bold">
-                    {settings.sets.toString().padStart(2, '0')}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => handleSetsAdjust('down')}
-                  className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mt-2"
-                >
-                  <Ionicons name="chevron-down" size={16} color="#374151" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          <View className="w-full rounded-xl overflow-hidden">
-            <LinearGradient
-              colors={['#EC4899', '#8B5CF6']}
-              style={{
-                borderRadius: 12,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => setTimeModalVisible(false)}
-                className="w-full py-4"
-              >
-                <Text className="text-white font-semibold text-center">
-                  확인
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
 
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -465,7 +394,7 @@ const FitIntervalApp: React.FC = () => {
                     ]}
                   >
                     <TouchableOpacity
-                      onPress={() => setTimeModalVisible(true)}
+                      onPress={() => openTimePicker('sets', { sets: settings.sets })}
                       style={styles.floatingButtonInner}
                     >
                       <Ionicons name="repeat" size={20} color="#10B981" />
@@ -578,8 +507,6 @@ const FitIntervalApp: React.FC = () => {
               </TouchableOpacity>
             </LinearGradient>
           </View>
-
-          <CustomTimeModal />
 
           <TimePickerModal
             visible={timePickerModal.visible}

@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 interface TimePickerModalProps {
   visible: boolean;
-  type: 'work' | 'rest';
+  type: 'work' | 'rest' | 'sets';
   minutes: number;
   seconds: number;
   onClose: () => void;
@@ -68,7 +68,7 @@ export const TimePickerModal: React.FC<TimePickerModalProps> = ({
         <View className="bg-white rounded-t-2xl p-5">
           <View className="flex-row justify-between items-center mb-5">
             <Text className="text-lg font-semibold text-gray-800">
-              Set {type === 'work' ? 'Work' : 'Rest'} Time
+              {type === 'sets' ? 'Set Number of Sets' : `Set ${type === 'work' ? 'Work' : 'Rest'} Time`}
             </Text>
             <TouchableOpacity
               onPress={onClose}
@@ -78,61 +78,88 @@ export const TimePickerModal: React.FC<TimePickerModalProps> = ({
             </TouchableOpacity>
           </View>
 
-          <View className="flex-row justify-center items-center space-x-4 mb-8">
-            {/* Minutes */}
-            <View className="items-center">
-              <Text className="text-xs text-gray-600 mb-1">Minutes</Text>
+          {type === 'sets' ? (
+            <View className="flex-row justify-center items-center mb-8">
               <View className="items-center">
-                <TouchableOpacity
-                  onPress={() => onAdjustTime('minutes', 'up')}
-                  className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mb-2"
-                >
-                  <Ionicons name="chevron-up" size={16} color="#374151" />
-                </TouchableOpacity>
-                <PanGestureHandler onGestureEvent={handleMinutesDrag}>
+                <Text className="text-xs text-gray-600 mb-1">Sets</Text>
+                <View className="items-center">
+                  <TouchableOpacity
+                    onPress={() => onAdjustTime('minutes', 'up')}
+                    className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mb-2"
+                  >
+                    <Ionicons name="chevron-up" size={16} color="#374151" />
+                  </TouchableOpacity>
                   <View className="w-16 h-16 items-center justify-center bg-gray-50 rounded-xl">
                     <Text className="text-3xl font-bold">
                       {minutes.toString().padStart(2, '0')}
                     </Text>
                   </View>
-                </PanGestureHandler>
-                <TouchableOpacity
-                  onPress={() => onAdjustTime('minutes', 'down')}
-                  className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mt-2"
-                >
-                  <Ionicons name="chevron-down" size={16} color="#374151" />
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => onAdjustTime('minutes', 'down')}
+                    className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mt-2"
+                  >
+                    <Ionicons name="chevron-down" size={16} color="#374151" />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-
-            <Text className="text-4xl font-bold mt-8">:</Text>
-
-            {/* Seconds */}
-            <View className="items-center">
-              <Text className="text-xs text-gray-600 mb-1">Seconds</Text>
+          ) : (
+            <View className="flex-row justify-center items-center space-x-4 mb-8">
+              {/* Minutes */}
               <View className="items-center">
-                <TouchableOpacity
-                  onPress={() => onAdjustTime('seconds', 'up')}
-                  className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mb-2"
-                >
-                  <Ionicons name="chevron-up" size={16} color="#374151" />
-                </TouchableOpacity>
-                <PanGestureHandler onGestureEvent={handleSecondsDrag}>
-                  <View className="w-16 h-16 items-center justify-center bg-gray-50 rounded-xl">
-                    <Text className="text-3xl font-bold">
-                      {seconds.toString().padStart(2, '0')}
-                    </Text>
-                  </View>
-                </PanGestureHandler>
-                <TouchableOpacity
-                  onPress={() => onAdjustTime('seconds', 'down')}
-                  className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mt-2"
-                >
-                  <Ionicons name="chevron-down" size={16} color="#374151" />
-                </TouchableOpacity>
+                <Text className="text-xs text-gray-600 mb-1">Minutes</Text>
+                <View className="items-center">
+                  <TouchableOpacity
+                    onPress={() => onAdjustTime('minutes', 'up')}
+                    className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mb-2"
+                  >
+                    <Ionicons name="chevron-up" size={16} color="#374151" />
+                  </TouchableOpacity>
+                  <PanGestureHandler onGestureEvent={handleMinutesDrag}>
+                    <View className="w-16 h-16 items-center justify-center bg-gray-50 rounded-xl">
+                      <Text className="text-3xl font-bold">
+                        {minutes.toString().padStart(2, '0')}
+                      </Text>
+                    </View>
+                  </PanGestureHandler>
+                  <TouchableOpacity
+                    onPress={() => onAdjustTime('minutes', 'down')}
+                    className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mt-2"
+                  >
+                    <Ionicons name="chevron-down" size={16} color="#374151" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <Text className="text-4xl font-bold mt-8">:</Text>
+
+              {/* Seconds */}
+              <View className="items-center">
+                <Text className="text-xs text-gray-600 mb-1">Seconds</Text>
+                <View className="items-center">
+                  <TouchableOpacity
+                    onPress={() => onAdjustTime('seconds', 'up')}
+                    className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mb-2"
+                  >
+                    <Ionicons name="chevron-up" size={16} color="#374151" />
+                  </TouchableOpacity>
+                  <PanGestureHandler onGestureEvent={handleSecondsDrag}>
+                    <View className="w-16 h-16 items-center justify-center bg-gray-50 rounded-xl">
+                      <Text className="text-3xl font-bold">
+                        {seconds.toString().padStart(2, '0')}
+                      </Text>
+                    </View>
+                  </PanGestureHandler>
+                  <TouchableOpacity
+                    onPress={() => onAdjustTime('seconds', 'down')}
+                    className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mt-2"
+                  >
+                    <Ionicons name="chevron-down" size={16} color="#374151" />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           <View className="w-full rounded-xl overflow-hidden">
             <LinearGradient
