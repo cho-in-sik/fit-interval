@@ -22,6 +22,8 @@ import { useTimerSettings } from '@/hooks/useTimerSettings';
 import { useTimePicker } from '@/hooks/useTimePicker';
 import { useTimer } from '@/hooks/useTimer';
 import { permissionService } from '@/services/permissionService';
+import { getThemeColors } from '@/utils/themeColors';
+import { useSettingsStore } from '@/store/settingsStore';
 
 interface Template {
   id: number;
@@ -37,6 +39,8 @@ interface Template {
 const FitIntervalApp: React.FC = () => {
   const { settings, updateWorkTime, updateRestTime, updateSets } =
     useTimerSettings();
+  const { theme } = useSettingsStore();
+  const themeColors = getThemeColors(theme.colorScheme);
 
   const {
     timePickerModal,
@@ -159,7 +163,7 @@ const FitIntervalApp: React.FC = () => {
         rest: 30,
         sets: 6,
         difficulty: 0.3,
-        color: '#10B981',
+        color: themeColors.workColors[0],
       },
       {
         id: 2,
@@ -169,7 +173,7 @@ const FitIntervalApp: React.FC = () => {
         rest: 15,
         sets: 10,
         difficulty: 0.8,
-        color: '#EC4899',
+        color: themeColors.accent,
       },
       {
         id: 3,
@@ -179,7 +183,7 @@ const FitIntervalApp: React.FC = () => {
         rest: 10,
         sets: 8,
         difficulty: 0.6,
-        color: '#F59E0B',
+        color: themeColors.warningColors[0],
       },
       {
         id: 4,
@@ -189,10 +193,10 @@ const FitIntervalApp: React.FC = () => {
         rest: settings.restTime.minutes * 60 + settings.restTime.seconds,
         sets: settings.sets,
         difficulty: 0.5,
-        color: '#6366F1',
+        color: themeColors.restColors[0],
       },
     ],
-    [settings.workTime, settings.restTime, settings.sets],
+    [settings.workTime, settings.restTime, settings.sets, themeColors],
   );
 
   // const GlassMorphismView: React.FC<{
@@ -255,7 +259,7 @@ const FitIntervalApp: React.FC = () => {
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <LinearGradient colors={['#667eea', '#764ba2']} style={styles.container}>
+      <LinearGradient colors={themeColors.background} style={styles.container}>
         <StatusBar barStyle="light-content" />
         <SafeAreaView style={styles.safeArea}>
           <ScrollView
@@ -321,7 +325,10 @@ const FitIntervalApp: React.FC = () => {
                     ]}
                   >
                     <LinearGradient
-                      colors={['#6366F1', '#8B5CF6', '#EC4899', '#6366F1']}
+                      colors={theme.colorScheme === 'purple' 
+                        ? ['#6366F1', '#8B5CF6', '#EC4899', '#6366F1']
+                        : [themeColors.restColors[0], themeColors.restColors[1], themeColors.accent, themeColors.restColors[0]]
+                      }
                       style={styles.timerGradient}
                     />
                   </Animated.View>
@@ -362,7 +369,7 @@ const FitIntervalApp: React.FC = () => {
                       onPress={handleWorkTimePress}
                       style={styles.floatingButtonInner}
                     >
-                      <Ionicons name="fitness" size={20} color="#EC4899" />
+                      <Ionicons name="fitness" size={20} color={themeColors.accent} />
                       <Text style={styles.floatingButtonText}>운동시간</Text>
                     </TouchableOpacity>
                   </Animated.View>
@@ -380,7 +387,7 @@ const FitIntervalApp: React.FC = () => {
                       onPress={handleRestTimePress}
                       style={styles.floatingButtonInner}
                     >
-                      <Ionicons name="pause" size={20} color="#8B5CF6" />
+                      <Ionicons name="pause" size={20} color={themeColors.restColors[1]} />
                       <Text style={styles.floatingButtonText}>휴식시간</Text>
                     </TouchableOpacity>
                   </Animated.View>
@@ -400,7 +407,7 @@ const FitIntervalApp: React.FC = () => {
                       }
                       style={styles.floatingButtonInner}
                     >
-                      <Ionicons name="repeat" size={20} color="#10B981" />
+                      <Ionicons name="repeat" size={20} color={themeColors.workColors[0]} />
                       <Text style={styles.floatingButtonText}>세트</Text>
                     </TouchableOpacity>
                   </Animated.View>
@@ -446,7 +453,7 @@ const FitIntervalApp: React.FC = () => {
                     </View>
                     <View className="w-[95%] bg-white bg-opacity-20 rounded-full h-3 ">
                       <LinearGradient
-                        colors={['#10B981', '#EC4899']}
+                        colors={[themeColors.workColors[0], themeColors.accent]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         className="h-3 rounded-full"
@@ -468,8 +475,11 @@ const FitIntervalApp: React.FC = () => {
           {/* Fixed Bottom CTA */}
           <View style={styles.bottomCTA}>
             <LinearGradient
-              colors={['#EC4899', '#8B5CF6']}
-              style={styles.startButton}
+              colors={theme.colorScheme === 'purple' 
+                ? ['#EC4899', '#8B5CF6']
+                : [themeColors.accent, themeColors.restColors[1]]
+              }
+              style={[styles.startButton, { shadowColor: theme.colorScheme === 'purple' ? '#EC4899' : themeColors.accent }]}
             >
               <TouchableOpacity
                 style={styles.startButtonInner}
@@ -831,7 +841,6 @@ const styles = StyleSheet.create({
   },
   startButton: {
     borderRadius: 16,
-    shadowColor: '#EC4899',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,

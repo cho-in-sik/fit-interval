@@ -2,8 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRef } from 'react';
 import { Animated, Text, TouchableOpacity, View } from 'react-native';
+import { getThemeColors } from '@/utils/themeColors';
+import { useSettingsStore } from '@/store/settingsStore';
 
 export default function AIRecommend() {
+  const { theme } = useSettingsStore();
+  const themeColors = getThemeColors(theme.colorScheme);
   const glowAnim = useRef(new Animated.Value(0)).current;
   return (
     <View className="px-6 mb-8">
@@ -17,7 +21,7 @@ export default function AIRecommend() {
         }}
       >
         <LinearGradient
-          colors={['#10B981', '#059669']}
+          colors={themeColors.background}
           className="rounded-2xl p-4 relative overflow-hidden"
         >
           <View className="absolute top-2 right-2">

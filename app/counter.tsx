@@ -19,6 +19,7 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { audioService } from '@/services/audioService';
 import WorkoutCompleteModal from '@/components/WorkoutCompleteModal';
 import { workoutStorage } from '@/utils/workoutStorage';
+import { getThemeColors } from '@/utils/themeColors';
 
 const { width, height } = Dimensions.get('window');
 
@@ -39,7 +40,7 @@ interface TimerState {
 const FitIntervalTimer: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { audio, timer } = useSettingsStore();
+  const { audio, timer, theme } = useSettingsStore();
 
   const workTime = parseInt(
     (params.workTime as string) ||
@@ -259,12 +260,13 @@ const FitIntervalTimer: React.FC = () => {
   };
 
   const getGradientColors = (): [string, string] => {
+    const themeColors = getThemeColors(theme.colorScheme);
     if (state.timeRemaining <= 3 && state.timeRemaining > 0) {
-      return ['#EF4444', '#DC2626']; // Warning colors
+      return themeColors.warningColors;
     }
     return state.currentPhase === 'work'
-      ? ['#10B981', '#059669'] // Work colors
-      : ['#3B82F6', '#1E40AF']; // Rest colors
+      ? themeColors.workColors
+      : themeColors.restColors;
   };
 
   const handlePausePlay = () => {

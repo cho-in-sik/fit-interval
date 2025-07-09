@@ -9,6 +9,10 @@ export interface AudioSettings {
   vibrationEnabled: boolean;
 }
 
+export interface ThemeSettings {
+  colorScheme: 'purple' | 'blue' | 'green';
+}
+
 export interface TimerSettings {
   workTime: { minutes: number; seconds: number };
   restTime: { minutes: number; seconds: number };
@@ -19,12 +23,15 @@ export interface TimerSettings {
 interface SettingsState {
   audio: AudioSettings;
   timer: TimerSettings;
+  theme: ThemeSettings;
   setAudioSettings: (settings: Partial<AudioSettings>) => void;
   setTimerSettings: (settings: Partial<TimerSettings>) => void;
+  setThemeSettings: (settings: Partial<ThemeSettings>) => void;
   setSoundEnabled: (enabled: boolean) => void;
   setVolume: (volume: number) => void;
   setVoiceEnabled: (enabled: boolean) => void;
   setVibrationEnabled: (enabled: boolean) => void;
+  setColorScheme: (colorScheme: 'purple' | 'blue' | 'green') => void;
 }
 
 const defaultAudioSettings: AudioSettings = {
@@ -41,11 +48,16 @@ const defaultTimerSettings: TimerSettings = {
   keepScreenOn: true,
 };
 
+const defaultThemeSettings: ThemeSettings = {
+  colorScheme: 'purple',
+};
+
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set, get) => ({
       audio: defaultAudioSettings,
       timer: defaultTimerSettings,
+      theme: defaultThemeSettings,
 
       setAudioSettings: (settings) =>
         set((state) => ({
@@ -55,6 +67,11 @@ export const useSettingsStore = create<SettingsState>()(
       setTimerSettings: (settings) =>
         set((state) => ({
           timer: { ...state.timer, ...settings },
+        })),
+
+      setThemeSettings: (settings) =>
+        set((state) => ({
+          theme: { ...state.theme, ...settings },
         })),
 
       setSoundEnabled: (enabled) =>
@@ -75,6 +92,11 @@ export const useSettingsStore = create<SettingsState>()(
       setVibrationEnabled: (enabled) =>
         set((state) => ({
           audio: { ...state.audio, vibrationEnabled: enabled },
+        })),
+
+      setColorScheme: (colorScheme) =>
+        set((state) => ({
+          theme: { ...state.theme, colorScheme },
         })),
     }),
     {

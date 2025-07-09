@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { getThemeColors } from '@/utils/themeColors';
+import { useSettingsStore } from '@/store/settingsStore';
 
 interface WorkoutCompleteModalProps {
   visible: boolean;
@@ -31,6 +33,8 @@ const WorkoutCompleteModal: React.FC<WorkoutCompleteModalProps> = ({
   onClose,
   workoutData,
 }) => {
+  const { theme } = useSettingsStore();
+  const themeColors = getThemeColors(theme.colorScheme);
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -60,7 +64,7 @@ const WorkoutCompleteModal: React.FC<WorkoutCompleteModalProps> = ({
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
           <LinearGradient
-            colors={['#10B981', '#059669']}
+            colors={themeColors.background}
             style={styles.gradient}
           >
             {/* Header */}

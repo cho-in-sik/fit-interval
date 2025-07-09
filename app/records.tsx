@@ -13,11 +13,15 @@ import { Ionicons } from '@expo/vector-icons';
 import Drawer from '@/components/Drawer';
 import { workoutStorage, WorkoutRecord } from '@/utils/workoutStorage';
 import { LinearGradient } from 'expo-linear-gradient';
+import { getThemeColors } from '@/utils/themeColors';
+import { useSettingsStore } from '@/store/settingsStore';
 
 const WorkoutHistoryScreen: React.FC = () => {
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [workoutRecords, setWorkoutRecords] = useState<WorkoutRecord[]>([]);
   const [stats, setStats] = useState({ totalTime: 0, totalWorkouts: 0 });
+  const { theme } = useSettingsStore();
+  const themeColors = getThemeColors(theme.colorScheme);
 
   useEffect(() => {
     loadWorkouts();
@@ -79,7 +83,7 @@ const WorkoutHistoryScreen: React.FC = () => {
   };
 
   return (
-    <LinearGradient colors={['#667eea', '#764ba2']} style={{ flex: 1 }}>
+    <LinearGradient colors={themeColors.background} style={{ flex: 1 }}>
       <SafeAreaView className="flex-1">
         <StatusBar barStyle="light-content" />
 

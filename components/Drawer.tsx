@@ -12,8 +12,10 @@ import {
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { getThemeColors } from '@/utils/themeColors';
+import { useSettingsStore } from '@/store/settingsStore';
 
-const MenuItem = ({ item, isActive, onPress }: any) => {
+const MenuItem = ({ item, isActive, onPress, themeColors }: any) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const onPressIn = () => {
@@ -43,7 +45,7 @@ const MenuItem = ({ item, isActive, onPress }: any) => {
         <Ionicons
           name={item.icon}
           size={22}
-          color={isActive ? '#EC4899' : 'white'}
+          color={isActive ? themeColors.accent : 'white'}
         />
         <Text
           className={`text-lg ml-4 ${
@@ -61,6 +63,8 @@ export default function Drawer({ drawerVisible, setDrawerVisible }: any) {
   const drawerWidth = Dimensions.get('window').width * 0.7;
   const slideAnim = useRef(new Animated.Value(drawerWidth)).current;
   const pathname = usePathname();
+  const { theme } = useSettingsStore();
+  const themeColors = getThemeColors(theme.colorScheme);
 
   useEffect(() => {
     if (drawerVisible) {
@@ -116,7 +120,7 @@ export default function Drawer({ drawerVisible, setDrawerVisible }: any) {
           ]}
           className="h-full shadow-2xl ml-auto rounded-2xl overflow-hidden"
         >
-          <LinearGradient colors={['#667eea', '#764ba2']} style={{ flex: 1 }}>
+          <LinearGradient colors={themeColors.background} style={{ flex: 1 }}>
             <TouchableOpacity activeOpacity={1} className="flex-1">
               <SafeAreaView className="flex-1 p-5 mx-3">
                 <View className="flex-row justify-between items-center mb-12 mt-2">
@@ -139,6 +143,7 @@ export default function Drawer({ drawerVisible, setDrawerVisible }: any) {
                         (pathname === '/' && item.id === '/')
                       }
                       onPress={() => handleNavigation(item.id)}
+                      themeColors={themeColors}
                     />
                   ))}
                 </View>

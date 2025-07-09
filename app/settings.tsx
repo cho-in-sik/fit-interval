@@ -18,14 +18,17 @@ import { useSettingsStore } from '@/store/settingsStore';
 import { permissionService } from '@/services/permissionService';
 import { audioService } from '@/services/audioService';
 import { LinearGradient } from 'expo-linear-gradient';
+import { getThemeColors } from '@/utils/themeColors';
 
 const SettingsScreen: React.FC = () => {
   const {
     audio,
+    theme,
     setSoundEnabled,
     setVolume,
     setVoiceEnabled,
     setVibrationEnabled,
+    setColorScheme,
   } = useSettingsStore();
 
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -125,8 +128,14 @@ const SettingsScreen: React.FC = () => {
     setVibrationEnabled(value);
   };
 
+  const handleColorSchemeChange = (colorScheme: 'purple' | 'blue' | 'green') => {
+    setColorScheme(colorScheme);
+  };
+
+  const themeColors = getThemeColors(theme.colorScheme);
+
   return (
-    <LinearGradient colors={['#667eea', '#764ba2']} style={{ flex: 1 }}>
+    <LinearGradient colors={themeColors.background} style={{ flex: 1 }}>
       <SafeAreaView className="flex-1">
         <ScrollView
           className="flex-1"
@@ -170,7 +179,7 @@ const SettingsScreen: React.FC = () => {
                         <Icon
                           name={soundEnabled ? 'volume-high' : 'volume-xmark'}
                           size={16}
-                          color="#EC4899"
+                          color={themeColors.accent}
                           solid
                         />
                       </View>
@@ -186,7 +195,7 @@ const SettingsScreen: React.FC = () => {
                     <Switch
                       value={soundEnabled}
                       onValueChange={handleSoundToggle}
-                      trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
+                      trackColor={{ false: '#D1D5DB', true: themeColors.accent }}
                       thumbColor="#FFFFFF"
                     />
                   </View>
@@ -204,7 +213,7 @@ const SettingsScreen: React.FC = () => {
                         <Icon
                           name="microphone"
                           size={16}
-                          color={!soundEnabled ? '#9CA3AF' : '#EC4899'}
+                          color={!soundEnabled ? '#9CA3AF' : themeColors.accent}
                           solid
                         />
                       </View>
@@ -232,7 +241,7 @@ const SettingsScreen: React.FC = () => {
                     <Switch
                       value={voiceEnabled && soundEnabled}
                       onValueChange={handleVoiceToggle}
-                      trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
+                      trackColor={{ false: '#D1D5DB', true: themeColors.accent }}
                       thumbColor="#FFFFFF"
                       disabled={!soundEnabled}
                     />
@@ -250,7 +259,7 @@ const SettingsScreen: React.FC = () => {
                       <Icon
                         name="volume-low"
                         size={16}
-                        color={!soundEnabled ? '#9CA3AF' : '#EC4899'}
+                        color={!soundEnabled ? '#9CA3AF' : themeColors.accent}
                         solid
                       />
                     </View>
@@ -297,10 +306,10 @@ const SettingsScreen: React.FC = () => {
                         onValueChange={handleVolumeChange}
                         onSlidingComplete={handleVolumeTest}
                         minimumTrackTintColor={
-                          !soundEnabled ? '#D1D5DB' : '#EC4899'
+                          !soundEnabled ? '#D1D5DB' : themeColors.accent
                         }
                         maximumTrackTintColor="#E5E7EB"
-                        thumbTintColor={!soundEnabled ? '#D1D5DB' : '#EC4899'}
+                        thumbTintColor={!soundEnabled ? '#D1D5DB' : themeColors.accent}
                         disabled={!soundEnabled}
                       />
                     </View>
@@ -328,7 +337,7 @@ const SettingsScreen: React.FC = () => {
                         <Icon
                           name="mobile-screen-button"
                           size={16}
-                          color="#EC4899"
+                          color={themeColors.accent}
                           solid
                         />
                       </View>
@@ -344,9 +353,91 @@ const SettingsScreen: React.FC = () => {
                     <Switch
                       value={vibrationEnabled}
                       onValueChange={handleVibrationToggle}
-                      trackColor={{ false: '#D1D5DB', true: '#EC4899' }}
+                      trackColor={{ false: '#D1D5DB', true: themeColors.accent }}
                       thumbColor="#FFFFFF"
                     />
+                  </View>
+                </View>
+              </View>
+
+              {/* Theme Section */}
+              <View className="mb-8">
+                <Text className="text-lg font-semibold text-white mb-4">
+                  Theme
+                </Text>
+
+                {/* Color Scheme Selection */}
+                <View className="bg-white/15 rounded-xl border border-white/30 p-4">
+                  <View className="flex-row items-center mb-4">
+                    <View className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                      <Icon
+                        name="palette"
+                        size={16}
+                        color={themeColors.accent}
+                        solid
+                      />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-base font-medium text-white">
+                        Color Scheme
+                      </Text>
+                      <Text className="text-sm text-white opacity-80">
+                        Choose your preferred color theme
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className="flex-row justify-between px-2">
+                    {/* Purple Theme */}
+                    <TouchableOpacity
+                      onPress={() => handleColorSchemeChange('purple')}
+                      className="flex-1 items-center mr-2"
+                    >
+                      <View className="w-12 h-12 rounded-full mb-2 border-2 border-white/30"
+                        style={{ backgroundColor: '#EC4899' }}
+                      >
+                        {theme.colorScheme === 'purple' && (
+                          <View className="w-full h-full rounded-full flex items-center justify-center">
+                            <Icon name="check" size={16} color="white" solid />
+                          </View>
+                        )}
+                      </View>
+                      <Text className="text-xs text-white opacity-80">Purple</Text>
+                    </TouchableOpacity>
+
+                    {/* Blue Theme */}
+                    <TouchableOpacity
+                      onPress={() => handleColorSchemeChange('blue')}
+                      className="flex-1 items-center mx-2"
+                    >
+                      <View className="w-12 h-12 rounded-full mb-2 border-2 border-white/30"
+                        style={{ backgroundColor: '#3B82F6' }}
+                      >
+                        {theme.colorScheme === 'blue' && (
+                          <View className="w-full h-full rounded-full flex items-center justify-center">
+                            <Icon name="check" size={16} color="white" solid />
+                          </View>
+                        )}
+                      </View>
+                      <Text className="text-xs text-white opacity-80">Blue</Text>
+                    </TouchableOpacity>
+
+                    {/* Green Theme */}
+                    <TouchableOpacity
+                      onPress={() => handleColorSchemeChange('green')}
+                      className="flex-1 items-center ml-2"
+                    >
+                      <View className="w-12 h-12 rounded-full mb-2 border-2 border-white/30"
+                        style={{ backgroundColor: '#10B981' }}
+                      >
+                        {theme.colorScheme === 'green' && (
+                          <View className="w-full h-full rounded-full flex items-center justify-center">
+                            <Icon name="check" size={16} color="white" solid />
+                          </View>
+                        )}
+                      </View>
+                      <Text className="text-xs text-white opacity-80">Green</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>

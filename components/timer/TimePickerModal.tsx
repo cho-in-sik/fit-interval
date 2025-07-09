@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PanGestureHandler, State, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
+import { getThemeColors } from '@/utils/themeColors';
+import { useSettingsStore } from '@/store/settingsStore';
 
 interface TimePickerModalProps {
   visible: boolean;
@@ -25,6 +27,8 @@ export const TimePickerModal: React.FC<TimePickerModalProps> = ({
   onAdjustTime,
   onDragTime,
 }) => {
+  const { theme } = useSettingsStore();
+  const themeColors = getThemeColors(theme.colorScheme);
   const minutesStartY = useRef(0);
   const secondsStartY = useRef(0);
   const minutesCurrentValue = useRef(minutes);
@@ -163,7 +167,7 @@ export const TimePickerModal: React.FC<TimePickerModalProps> = ({
 
           <View className="w-full rounded-xl overflow-hidden">
             <LinearGradient
-              colors={['#EC4899', '#8B5CF6']}
+              colors={themeColors.background}
               style={{
                 borderRadius: 12,
               }}
