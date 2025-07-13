@@ -199,16 +199,6 @@ const FitIntervalApp: React.FC = () => {
     [settings.workTime, settings.restTime, settings.sets, themeColors],
   );
 
-  // const GlassMorphismView: React.FC<{
-  //   children: React.ReactNode;
-  //   style?: any;
-  //   intensity?: number;
-  // }> = ({ children, style, intensity = 20 }) => (
-  //   <BlurView intensity={intensity} style={[styles.glassContainer, style]}>
-  //     <View style={[styles.glassInner, style]}>{children}</View>
-  //   </BlurView>
-  // );
-
   const WorkoutCard: React.FC<{ template: Template }> = ({ template }) => {
     const handleTemplatePress = () => {
       setSelectedTemplate(template.id);
@@ -325,9 +315,15 @@ const FitIntervalApp: React.FC = () => {
                     ]}
                   >
                     <LinearGradient
-                      colors={theme.colorScheme === 'purple' 
-                        ? ['#6366F1', '#8B5CF6', '#EC4899', '#6366F1']
-                        : [themeColors.restColors[0], themeColors.restColors[1], themeColors.accent, themeColors.restColors[0]]
+                      colors={
+                        theme.colorScheme === 'purple'
+                          ? ['#6366F1', '#8B5CF6', '#EC4899', '#6366F1']
+                          : [
+                              themeColors.restColors[0],
+                              themeColors.restColors[1],
+                              themeColors.accent,
+                              themeColors.restColors[0],
+                            ]
                       }
                       style={styles.timerGradient}
                     />
@@ -369,7 +365,11 @@ const FitIntervalApp: React.FC = () => {
                       onPress={handleWorkTimePress}
                       style={styles.floatingButtonInner}
                     >
-                      <Ionicons name="fitness" size={20} color={themeColors.accent} />
+                      <Ionicons
+                        name="fitness"
+                        size={20}
+                        color={themeColors.accent}
+                      />
                       <Text style={styles.floatingButtonText}>운동시간</Text>
                     </TouchableOpacity>
                   </Animated.View>
@@ -387,7 +387,11 @@ const FitIntervalApp: React.FC = () => {
                       onPress={handleRestTimePress}
                       style={styles.floatingButtonInner}
                     >
-                      <Ionicons name="pause" size={20} color={themeColors.restColors[1]} />
+                      <Ionicons
+                        name="pause"
+                        size={20}
+                        color={themeColors.restColors[1]}
+                      />
                       <Text style={styles.floatingButtonText}>휴식시간</Text>
                     </TouchableOpacity>
                   </Animated.View>
@@ -407,7 +411,11 @@ const FitIntervalApp: React.FC = () => {
                       }
                       style={styles.floatingButtonInner}
                     >
-                      <Ionicons name="repeat" size={20} color={themeColors.workColors[0]} />
+                      <Ionicons
+                        name="repeat"
+                        size={20}
+                        color={themeColors.workColors[0]}
+                      />
                       <Text style={styles.floatingButtonText}>세트</Text>
                     </TouchableOpacity>
                   </Animated.View>
@@ -475,11 +483,20 @@ const FitIntervalApp: React.FC = () => {
           {/* Fixed Bottom CTA */}
           <View style={styles.bottomCTA}>
             <LinearGradient
-              colors={theme.colorScheme === 'purple' 
-                ? ['#EC4899', '#8B5CF6']
-                : [themeColors.accent, themeColors.restColors[1]]
+              colors={
+                theme.colorScheme === 'purple'
+                  ? ['#EC4899', '#8B5CF6']
+                  : [themeColors.accent, themeColors.restColors[1]]
               }
-              style={[styles.startButton, { shadowColor: theme.colorScheme === 'purple' ? '#EC4899' : themeColors.accent }]}
+              style={[
+                styles.startButton,
+                {
+                  shadowColor:
+                    theme.colorScheme === 'purple'
+                      ? '#EC4899'
+                      : themeColors.accent,
+                },
+              ]}
             >
               <TouchableOpacity
                 style={styles.startButtonInner}
