@@ -95,9 +95,7 @@ const WorkoutHistoryScreen: React.FC = () => {
               style={{ width: 50, height: 50 }}
               resizeMode="cover"
             />
-            <Text className="text-xl font-bold ml-2 text-white">
-              FitInterval
-            </Text>
+            <Text className="text-xl font-bold ml-2 text-white">InterFit</Text>
           </View>
           <TouchableOpacity
             onPress={() => setDrawerVisible(true)}

@@ -80,7 +80,7 @@ const SettingsScreen: React.FC = () => {
       if (!permissions.audio) {
         Alert.alert(
           '권한 필요',
-          '오디오 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.'
+          '오디오 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.',
         );
         return;
       }
@@ -118,7 +118,7 @@ const SettingsScreen: React.FC = () => {
       if (!permissions.haptics) {
         Alert.alert(
           '권한 필요',
-          '진동 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.'
+          '진동 권한이 필요합니다. 앱을 재시작하면 권한을 다시 요청합니다.',
         );
         return;
       }
@@ -128,7 +128,9 @@ const SettingsScreen: React.FC = () => {
     setVibrationEnabled(value);
   };
 
-  const handleColorSchemeChange = (colorScheme: 'purple' | 'blue' | 'green') => {
+  const handleColorSchemeChange = (
+    colorScheme: 'purple' | 'blue' | 'green',
+  ) => {
     setColorScheme(colorScheme);
   };
 
@@ -152,7 +154,7 @@ const SettingsScreen: React.FC = () => {
                   resizeMode="cover"
                 />
                 <Text className="text-xl font-bold ml-2 text-white">
-                  FitInterval
+                  InterFit
                 </Text>
               </View>
               <TouchableOpacity
@@ -195,7 +197,10 @@ const SettingsScreen: React.FC = () => {
                     <Switch
                       value={soundEnabled}
                       onValueChange={handleSoundToggle}
-                      trackColor={{ false: '#D1D5DB', true: themeColors.accent }}
+                      trackColor={{
+                        false: '#D1D5DB',
+                        true: themeColors.accent,
+                      }}
                       thumbColor="#FFFFFF"
                     />
                   </View>
@@ -241,7 +246,10 @@ const SettingsScreen: React.FC = () => {
                     <Switch
                       value={voiceEnabled && soundEnabled}
                       onValueChange={handleVoiceToggle}
-                      trackColor={{ false: '#D1D5DB', true: themeColors.accent }}
+                      trackColor={{
+                        false: '#D1D5DB',
+                        true: themeColors.accent,
+                      }}
                       thumbColor="#FFFFFF"
                       disabled={!soundEnabled}
                     />
@@ -309,7 +317,9 @@ const SettingsScreen: React.FC = () => {
                           !soundEnabled ? '#D1D5DB' : themeColors.accent
                         }
                         maximumTrackTintColor="#E5E7EB"
-                        thumbTintColor={!soundEnabled ? '#D1D5DB' : themeColors.accent}
+                        thumbTintColor={
+                          !soundEnabled ? '#D1D5DB' : themeColors.accent
+                        }
                         disabled={!soundEnabled}
                       />
                     </View>
@@ -353,7 +363,10 @@ const SettingsScreen: React.FC = () => {
                     <Switch
                       value={vibrationEnabled}
                       onValueChange={handleVibrationToggle}
-                      trackColor={{ false: '#D1D5DB', true: themeColors.accent }}
+                      trackColor={{
+                        false: '#D1D5DB',
+                        true: themeColors.accent,
+                      }}
                       thumbColor="#FFFFFF"
                     />
                   </View>
@@ -393,7 +406,8 @@ const SettingsScreen: React.FC = () => {
                       onPress={() => handleColorSchemeChange('purple')}
                       className="flex-1 items-center mr-2"
                     >
-                      <View className="w-12 h-12 rounded-full mb-2 border-2 border-white/30"
+                      <View
+                        className="w-12 h-12 rounded-full mb-2 border-2 border-white/30"
                         style={{ backgroundColor: '#EC4899' }}
                       >
                         {theme.colorScheme === 'purple' && (
@@ -402,7 +416,9 @@ const SettingsScreen: React.FC = () => {
                           </View>
                         )}
                       </View>
-                      <Text className="text-xs text-white opacity-80">Purple</Text>
+                      <Text className="text-xs text-white opacity-80">
+                        Purple
+                      </Text>
                     </TouchableOpacity>
 
                     {/* Blue Theme */}
@@ -410,7 +426,8 @@ const SettingsScreen: React.FC = () => {
                       onPress={() => handleColorSchemeChange('blue')}
                       className="flex-1 items-center mx-2"
                     >
-                      <View className="w-12 h-12 rounded-full mb-2 border-2 border-white/30"
+                      <View
+                        className="w-12 h-12 rounded-full mb-2 border-2 border-white/30"
                         style={{ backgroundColor: '#3B82F6' }}
                       >
                         {theme.colorScheme === 'blue' && (
@@ -419,7 +436,9 @@ const SettingsScreen: React.FC = () => {
                           </View>
                         )}
                       </View>
-                      <Text className="text-xs text-white opacity-80">Blue</Text>
+                      <Text className="text-xs text-white opacity-80">
+                        Blue
+                      </Text>
                     </TouchableOpacity>
 
                     {/* Green Theme */}
@@ -427,7 +446,8 @@ const SettingsScreen: React.FC = () => {
                       onPress={() => handleColorSchemeChange('green')}
                       className="flex-1 items-center ml-2"
                     >
-                      <View className="w-12 h-12 rounded-full mb-2 border-2 border-white/30"
+                      <View
+                        className="w-12 h-12 rounded-full mb-2 border-2 border-white/30"
                         style={{ backgroundColor: '#10B981' }}
                       >
                         {theme.colorScheme === 'green' && (
@@ -436,7 +456,9 @@ const SettingsScreen: React.FC = () => {
                           </View>
                         )}
                       </View>
-                      <Text className="text-xs text-white opacity-80">Green</Text>
+                      <Text className="text-xs text-white opacity-80">
+                        Green
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -449,7 +471,7 @@ const SettingsScreen: React.FC = () => {
                     <Icon name="stopwatch" size={28} color="white" solid />
                   </View>
                   <Text className="text-lg font-semibold text-white mb-1">
-                    FitInterval
+                    InterFit
                   </Text>
                   <Text className="text-sm text-white opacity-80 mb-2">
                     Version 1.0.0

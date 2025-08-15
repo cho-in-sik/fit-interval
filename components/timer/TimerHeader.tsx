@@ -15,9 +15,7 @@ export const TimerHeader: React.FC<TimerHeaderProps> = ({ onMenuPress }) => {
           style={{ width: 50, height: 50 }}
           resizeMode="cover"
         />
-        <Text className="text-xl font-bold ml-2 text-gray-800">
-          FitInterval
-        </Text>
+        <Text className="text-xl font-bold ml-2 text-gray-800">InterFit</Text>
       </View>
       <TouchableOpacity
         onPress={onMenuPress}
