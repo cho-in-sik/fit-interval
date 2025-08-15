@@ -156,7 +156,7 @@ class PermissionService {
     return new Promise((resolve) => {
       Alert.alert(
         '권한 요청',
-        'FitInterval이 원활히 작동하려면 다음 권한들이 필요합니다:\n\n• 오디오: 음성 안내 및 알림음\n• 진동: 타이머 알림\n• 음성 합성: 운동 안내',
+        'FitInterval이 원활히 작동하려면 다음 권한들이 필요합니다:\n\n• 오디오: 음성 안내 및 알림음\n• 진동: 타이머 알림',
         [
           {
             text: '취소',

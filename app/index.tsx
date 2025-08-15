@@ -72,7 +72,6 @@ const FitIntervalApp: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Float animations
     const createFloatAnimation = (animValue: Animated.Value) => {
       return Animated.loop(
         Animated.sequence([
