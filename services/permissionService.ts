@@ -14,7 +14,7 @@ class PermissionService {
     haptics: false,
     speech: false,
   };
-  
+
   private readonly STORAGE_KEY = 'permissions-status';
 
   async loadPermissions(): Promise<void> {
@@ -31,7 +31,10 @@ class PermissionService {
 
   async savePermissions(): Promise<void> {
     try {
-      await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.permissionStatus));
+      await AsyncStorage.setItem(
+        this.STORAGE_KEY,
+        JSON.stringify(this.permissionStatus),
+      );
     } catch (error) {
       console.error('Failed to save permissions:', error);
     }
@@ -65,13 +68,13 @@ class PermissionService {
   async requestAudioPermission(): Promise<boolean> {
     try {
       const { status: currentStatus } = await Audio.getPermissionsAsync();
-      
+
       if (currentStatus === 'granted') {
         this.permissionStatus.audio = true;
         await this.savePermissions();
         return true;
       }
-      
+
       const { status } = await Audio.requestPermissionsAsync();
       this.permissionStatus.audio = status === 'granted';
       await this.savePermissions();
@@ -106,7 +109,7 @@ class PermissionService {
               resolve(granted);
             },
           },
-        ]
+        ],
       );
     });
   }
@@ -134,7 +137,7 @@ class PermissionService {
               resolve(true);
             },
           },
-        ]
+        ],
       );
     });
   }
@@ -144,11 +147,10 @@ class PermissionService {
   }
 
   async requestAllPermissionsOnFirstLaunch(): Promise<PermissionStatus> {
-    await this.loadPermissions();
-    
     // 이미 권한을 요청했다면 다시 요청하지 않음
     const stored = await AsyncStorage.getItem(this.STORAGE_KEY);
     if (stored) {
+      await this.loadPermissions();
       return this.getPermissionStatus();
     }
 
@@ -156,7 +158,7 @@ class PermissionService {
     return new Promise((resolve) => {
       Alert.alert(
         '권한 요청',
-        'FitInterval이 원활히 작동하려면 다음 권한들이 필요합니다:\n\n• 오디오: 음성 안내 및 알림음\n• 진동: 타이머 알림',
+        '인터핏이 원활히 작동하려면 다음 권한들이 필요합니다\n\n 오디오: 음성 안내 및 알림음\n 진동: 타이머 알림',
         [
           {
             text: '취소',
@@ -190,7 +192,7 @@ class PermissionService {
               resolve(this.getPermissionStatus());
             },
           },
-        ]
+        ],
       );
     });
   }

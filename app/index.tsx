@@ -266,7 +266,7 @@ const FitIntervalApp: React.FC = () => {
                     />
                   </View>
                   <View style={styles.userDetails}>
-                    <Text style={styles.appName}>FITINTERVAL</Text>
+                    <Text style={styles.appName}>InterFit</Text>
                     {/* <Text style={styles.greeting}>운동을 시작해보세요!</Text> */}
                   </View>
                 </View>
