@@ -42,8 +42,8 @@ class PermissionService {
 
   async checkAudioPermission(): Promise<boolean> {
     try {
-      const { status } = await Audio.getPermissionsAsync();
-      this.permissionStatus.audio = status === 'granted';
+      // 사운드 재생만 하므로 권한 요청 없이 true로 설정
+      this.permissionStatus.audio = true;
       return this.permissionStatus.audio;
     } catch (error) {
       console.error('Failed to check audio permission:', error);
@@ -67,18 +67,10 @@ class PermissionService {
 
   async requestAudioPermission(): Promise<boolean> {
     try {
-      const { status: currentStatus } = await Audio.getPermissionsAsync();
-
-      if (currentStatus === 'granted') {
-        this.permissionStatus.audio = true;
-        await this.savePermissions();
-        return true;
-      }
-
-      const { status } = await Audio.requestPermissionsAsync();
-      this.permissionStatus.audio = status === 'granted';
+      // 사운드 재생만 하므로 권한 요청 없이 true로 설정
+      this.permissionStatus.audio = true;
       await this.savePermissions();
-      return this.permissionStatus.audio;
+      return true;
     } catch (error) {
       console.error('Failed to request audio permission:', error);
       return false;
@@ -176,13 +168,8 @@ class PermissionService {
           {
             text: '권한 허용',
             onPress: async () => {
-              // 오디오 권한 요청
-              try {
-                const { status } = await Audio.requestPermissionsAsync();
-                this.permissionStatus.audio = status === 'granted';
-              } catch (error) {
-                this.permissionStatus.audio = false;
-              }
+              // 사운드 재생만 하므로 권한 요청 없이 true로 설정
+              this.permissionStatus.audio = true;
 
               // 진동과 음성은 시스템 권한이므로 true로 설정
               this.permissionStatus.haptics = true;
